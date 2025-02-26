@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +33,7 @@ public interface LinkBannerController {
       @ApiResponse(responseCode = "200", description = "Get full list"),
       @ApiResponse(responseCode = "500", description = "Internal server exception"),
   })
-  List<LinkBannerDto> findAll();
+  Page<LinkBannerDto> findAll(Pageable pageable);
 
   @Operation(
       summary = "Creates a new link banner",

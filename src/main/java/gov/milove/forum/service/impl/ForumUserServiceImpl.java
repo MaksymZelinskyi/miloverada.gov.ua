@@ -3,7 +3,7 @@ package gov.milove.forum.service.impl;
 import gov.milove.main.domain.Image;
 import gov.milove.forum.dto.NewForumUserDto;
 import gov.milove.forum.domain.ForumUser;
-import gov.milove.main.repository.jpa.AppUserRepo;
+import gov.milove.main.repository.jpa.AppUserRepository;
 import gov.milove.forum.repository.jpa.ForumUserRepo;
 import gov.milove.main.repository.mongo.ImageRepo;
 import gov.milove.forum.service.ForumUserService;
@@ -18,7 +18,7 @@ import java.util.Date;
 @Log4j2
 public class ForumUserServiceImpl implements ForumUserService {
 
-    private final AppUserRepo appUserRepo;
+    private final AppUserRepository appUserRepository;
 
     private final ImageRepo imageRepo;
 
@@ -28,7 +28,7 @@ public class ForumUserServiceImpl implements ForumUserService {
     public ForumUser saveNewUser(NewForumUserDto dto, String appUserId) {
         ForumUser newForumUser = ForumUser.builder()
                 .id(appUserId)
-                .appUser(appUserRepo.getReferenceById(appUserId))
+                .appUser(appUserRepository.getReferenceById(appUserId))
                 .nickname(dto.getNickname())
                 .aboutMe(dto.getAboutMe())
                 .lastWasOnline(new Date())

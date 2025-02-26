@@ -4,7 +4,7 @@ import gov.milove.main.domain.MongoNewsImage;
 import gov.milove.main.domain.NewsImage;
 import gov.milove.main.exception.ImageNotFoundException;
 import gov.milove.main.exception.ServiceException;
-import gov.milove.main.repository.jpa.NewsImageRepo;
+import gov.milove.main.repository.jpa.NewsImageRepository;
 import gov.milove.main.repository.mongo.NewsImagesMongoRepo;
 import gov.milove.main.service.NewsImagesService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class NewsImagesServiceImpl implements NewsImagesService {
 
     private final NewsImagesMongoRepo newsImagesMongoRepo;
 
-    private final NewsImageRepo newsImageRepo;
+    private final NewsImageRepository newsImageRepository;
 
 
     @Override
@@ -37,7 +37,7 @@ public class NewsImagesServiceImpl implements NewsImagesService {
                 .map((mongoNewsImage -> new NewsImage(mongoNewsImage.getFileName(), mongoNewsImage.getId())))
                 .toList();
         log.info("images = {}", mapped);
-        return newsImageRepo.saveAll(mapped);
+        return newsImageRepository.saveAll(mapped);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class NewsImagesServiceImpl implements NewsImagesService {
 
     @Override
     public void deleteFromMongoIfNotUsed(String mongoId) {
-        if (!newsImageRepo.newsImageIsUsedMoreThenOneTime(mongoId)) {
+        if (!newsImageRepository.newsImageIsUsedMoreThenOneTime(mongoId)) {
             log.info("Image = {}, is not used", mongoId );
             newsImagesMongoRepo.deleteById(mongoId);
         } else {

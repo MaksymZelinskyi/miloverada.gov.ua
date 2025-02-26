@@ -5,10 +5,12 @@ import gov.milove.main.dto.LinkBannerDto;
 import gov.milove.main.dto.request.LinkBannerCreateRequest;
 import gov.milove.main.dto.request.LinkBannerUpdateRequest;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(
-    config = MapperConfig.class
+    config = MapperConfig.class,
+    uses = AppUserMapper.class
 )
 public interface LinkBannerMapper {
 

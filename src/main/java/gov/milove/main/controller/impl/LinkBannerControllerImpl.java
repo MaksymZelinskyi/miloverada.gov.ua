@@ -13,10 +13,14 @@ import java.security.Principal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,11 +42,8 @@ public class LinkBannerControllerImpl implements LinkBannerController {
 
   @Override
   @GetMapping("/link-banners")
-  public List<LinkBannerDto> findAll() {
-    List<LinkBanner> linkBannerList = linkBannerService.findAllBanners();
-    return linkBannerList.stream()
-        .map(linkBannerMapper::toLinkBannerDto)
-        .toList();
+  public Page<LinkBannerDto> findAll(@PageableDefault Pageable pageable) {
+    return linkBannerService.findAllBanners(pageable);
   }
 
   @Override
@@ -50,12 +51,8 @@ public class LinkBannerControllerImpl implements LinkBannerController {
   public ResponseEntity<LinkBannerDto> addBanner(
       @RequestBody LinkBannerCreateRequest request,
       Principal  user) {
-      log.info("Principal {}", user);
-//    log.info("Create link banner by user: {}, {}", user.getSubject(),
-//        user.getFullName());
-
     LinkBanner linkBanner = linkBannerMapper.toLinkBanner(request);
-    LinkBanner saved = linkBannerService.save(linkBanner);
+    LinkBanner saved = linkBannerService.save(linkBanner, user.getName());
 
     return new ResponseEntity<>(linkBannerMapper.toLinkBannerDto(saved), CREATED);
   }

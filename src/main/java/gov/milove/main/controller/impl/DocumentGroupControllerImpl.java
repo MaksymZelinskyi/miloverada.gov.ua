@@ -6,7 +6,7 @@ import gov.milove.main.domain.DocumentGroup;
 import gov.milove.main.dto.DocumentGroupWithGroupsDto;
 import gov.milove.main.dto.DocumentGroupWithGroupsDtoAndDocumentsDto;
 import gov.milove.main.exception.DocumentGroupNotFoundException;
-import gov.milove.main.repository.jpa.DocumentGroupRepo;
+import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.service.DocumentGroupService;
 import gov.milove.main.service.DocumentService;
 import jakarta.persistence.EntityNotFoundException;
@@ -22,29 +22,29 @@ import java.util.List;
 @Log4j2
 public class DocumentGroupControllerImpl implements DocumentGroupController {
 
-    private final DocumentGroupRepo documentGroupRepo;
+    private final DocumentGroupRepository documentGroupRepository;
     private final DocumentGroupService documentGroupService;
     private final DocumentService documentService;
 
 
     @Override
     public List<DocumentGroupWithGroupsDto> findAll() {
-        return documentGroupRepo.findDistinctByDocumentGroupIdOrderByCreatedOn(null);
+        return documentGroupRepository.findDistinctByDocumentGroupIdOrderByCreatedOn(null);
     }
 
     @Override
     public DocumentGroupWithGroupsDtoAndDocumentsDto createNewSubGroup(Long groupId, String name) {
 
-        DocumentGroup documentGroup = DocumentGroup.builder().documentGroup(groupId == null ? null : documentGroupRepo.getReferenceById(groupId)).name(name).build();
-        DocumentGroup saved = documentGroupRepo.save(documentGroup);
-        return documentGroupRepo.findDistinctById(saved.getId()).orElseThrow(EntityNotFoundException::new);
+        DocumentGroup documentGroup = DocumentGroup.builder().documentGroup(groupId == null ? null : documentGroupRepository.getReferenceById(groupId)).name(name).build();
+        DocumentGroup saved = documentGroupRepository.save(documentGroup);
+        return documentGroupRepository.findDistinctById(saved.getId()).orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
     public Long editSubGroup(Long id, String name) {
-        DocumentGroup group = documentGroupRepo.findById(id).orElseThrow(EntityNotFoundException::new);
+        DocumentGroup group = documentGroupRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         group.setName(name);
-        documentGroupRepo.save(group);
+        documentGroupRepository.save(group);
         return group.getId();
     }
 
@@ -63,6 +63,6 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
 
     @Override
     public DocumentGroupWithGroupsDtoAndDocumentsDto findById(Long id) {
-        return documentGroupRepo.findDistinctById(id).orElseThrow(DocumentGroupNotFoundException::new);
+        return documentGroupRepository.findDistinctById(id).orElseThrow(DocumentGroupNotFoundException::new);
     }
 }

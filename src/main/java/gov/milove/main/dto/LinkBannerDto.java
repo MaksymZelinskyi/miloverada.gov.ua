@@ -8,7 +8,8 @@ public record LinkBannerDto (
     String url,
     String text,
     LocalDateTime lastUpdated,
-    LocalDate createdOn
+    LocalDate createdOn,
+    AppUserDto addedBy
 ) {
 
 }

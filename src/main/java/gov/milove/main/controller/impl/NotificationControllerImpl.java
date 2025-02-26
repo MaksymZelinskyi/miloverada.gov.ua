@@ -5,9 +5,9 @@ import gov.milove.main.domain.Notification;
 import gov.milove.main.domain.NotificationView;
 import gov.milove.main.dto.NewNotificationDto;
 import gov.milove.main.dto.NotificationDtoWithViews;
-import gov.milove.main.repository.jpa.AppUserRepo;
-import gov.milove.main.repository.jpa.NotificationRepo;
-import gov.milove.main.repository.jpa.NotificationViewRepo;
+import gov.milove.main.repository.jpa.AppUserRepository;
+import gov.milove.main.repository.jpa.NotificationRepository;
+import gov.milove.main.repository.jpa.NotificationViewRepository;
 import gov.milove.main.util.Util;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,9 @@ import java.util.List;
 @Log4j2
 public class NotificationControllerImpl implements NotificationController {
 
-    private final NotificationRepo repo;
-    private final AppUserRepo appUserRepo;
-    private final NotificationViewRepo viewRepo;
+    private final NotificationRepository repo;
+    private final AppUserRepository appUserRepository;
+    private final NotificationViewRepository viewRepo;
 
     @Override
     public Long getTotalNumberOfActualNotifications(String encodedUserId) {
@@ -55,7 +55,7 @@ public class NotificationControllerImpl implements NotificationController {
     @Override
     public Notification createNew(NewNotificationDto n) {
         log.info("new notification - {}", n);
-        Notification saved = repo.save(new Notification(n.getMessage(), n.getText(), appUserRepo.getReferenceById(n.getAuthorId())));
+        Notification saved = repo.save(new Notification(n.getMessage(), n.getText(), appUserRepository.getReferenceById(n.getAuthorId())));
 
         log.info("saved a new notification! {}", saved);
         return repo.findById(saved.getId()).orElseThrow(EntityNotFoundException::new);
