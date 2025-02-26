@@ -10,11 +10,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.security.Principal;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.validation.annotation.Validated;
 
 @Tag(
@@ -76,5 +74,5 @@ public interface LinkBannerController {
       @ApiResponse(responseCode = "404", description = "Banner with provided id not found"),
       @ApiResponse(responseCode = "400", description = "Invalid id type provided, in must be int")
   })
-  ResponseEntity<?> delete(Long id);
+  ResponseEntity<Void> delete(Long id);
 }

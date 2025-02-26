@@ -5,13 +5,17 @@ import static gov.milove.main.constants.ExceptionConstants.APP_USER_NOT_FOUND_BY
 import gov.milove.main.domain.AppUser;
 import gov.milove.main.domain.LinkBanner;
 import gov.milove.main.dto.LinkBannerDto;
+import gov.milove.main.dto.request.LinkBannerCreateRequest;
 import gov.milove.main.dto.request.LinkBannerUpdateRequest;
 import gov.milove.main.exception.AppUserNotFoundException;
 import gov.milove.main.exception.LinkBannerNotFoundException;
+import gov.milove.main.exception.ValidationException;
 import gov.milove.main.repository.jpa.AppUserRepository;
 import gov.milove.main.repository.jpa.LinkBannerRepository;
+import gov.milove.main.service.ImageService;
 import gov.milove.main.service.LinkBannerService;
 import gov.milove.main.util.mapper.LinkBannerMapper;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -27,6 +31,8 @@ public class LinkBannerServiceImpl implements LinkBannerService {
 
   private final AppUserRepository appUserRepository;
 
+  private final ImageService imageService;
+
   private final LinkBannerMapper linkBannerMapper;
 
   @Override
@@ -36,19 +42,39 @@ public class LinkBannerServiceImpl implements LinkBannerService {
   }
 
   @Override
-  public LinkBanner save(LinkBanner linkBanner,  String userId) {
+  public LinkBannerDto save(LinkBannerCreateRequest request, String userId) {
+    LinkBanner linkBanner = linkBannerMapper.toLinkBanner(request);
     log.info("Save link banner from user: {}", userId);
+
+    validateImageParams(request);
+
+    if (Objects.nonNull(request.imageFile())) {
+      String imageId = imageService.saveImage(request.imageFile());
+      linkBanner.setImageId(imageId);
+    } else {
+      linkBanner.setImageUrl(request.imageUrl());
+    }
+
     AppUser user = appUserRepository.findById(userId)
         .orElseThrow(() -> new AppUserNotFoundException(APP_USER_NOT_FOUND_BY_ID.formatted(userId)));
     linkBanner.setAddedBy(user);
-    return linkBannerRepository.save(linkBanner);
+    LinkBanner saved =linkBannerRepository.save(linkBanner);
+    return linkBannerMapper.toLinkBannerDto(saved);
+  }
+
+
+  private void validateImageParams(LinkBannerCreateRequest request) {
+    if (Objects.isNull(request.imageFile()) && Objects.isNull(request.imageUrl())) {
+      throw new ValidationException("Image url or file should be provided");
+    }
   }
 
   @Override
-  public LinkBanner update(LinkBannerUpdateRequest request) {
+  public LinkBannerDto update(LinkBannerUpdateRequest request) {
     LinkBanner linkBanner = findById(request.id());
     linkBannerMapper.updateLinkBannerFromDto(request, linkBanner);
-    return linkBannerRepository.save(linkBanner);
+    LinkBanner saved = linkBannerRepository.save(linkBanner);
+    return linkBannerMapper.toLinkBannerDto(saved);
   }
 
   @Override

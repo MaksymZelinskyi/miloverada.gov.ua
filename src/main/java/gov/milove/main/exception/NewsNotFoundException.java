@@ -9,8 +9,4 @@ public class NewsNotFoundException extends EntityNotFoundException {
 
     public NewsNotFoundException() {
     }
-
-    public NewsNotFoundException(String message) {
-        super(message);
-    }
 }
