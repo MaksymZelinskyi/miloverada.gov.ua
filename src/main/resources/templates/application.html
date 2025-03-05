@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<pre th:text="${applicationText}" style="padding-bottom: 10px;  font-family: Arial, sans-serif;  color: #333;"></pre>
+
+<table style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+  <tr>
+    <td>
+      <strong th:text="${name}">Your Name</strong><br>
+      📞 <a th:href="@{'tel:' + ${phone}}" th:text="${phone}" style="color: #007bff; text-decoration: none;"></a><br>
+    </td>
+    <td>
+        <strong th:if="${email}">
+        ✉️ <a th:href="@{'mailto:' + ${email}}" th:text="${email}" style="color: #007bff; text-decoration: none;"></a><br>
+      </strong>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

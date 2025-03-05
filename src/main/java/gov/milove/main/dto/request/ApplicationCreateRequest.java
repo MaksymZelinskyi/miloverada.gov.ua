@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public record ApplicationCreateRequest (
     @Pattern(regexp = "^\\S+\\s+\\S+\\s+\\S+") String fullName,
     @Size(max = 13) String phoneNumber,
+    String email,
     @Size(max = 3000) String applicationText,
     MultipartFile[] files
 ) {

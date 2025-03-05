@@ -18,13 +18,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Override
-    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-        registry
-                .setMessageSizeLimit(9999999)
-                .setSendBufferSizeLimit(9999999);
-    }
-
-    @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-endpoint")
                 .setAllowedOrigins("http://localhost:3000", "https://miloverada.gov.ua").withSockJS();

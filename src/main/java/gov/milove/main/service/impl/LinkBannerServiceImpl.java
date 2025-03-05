@@ -62,7 +62,6 @@ public class LinkBannerServiceImpl implements LinkBannerService {
     return linkBannerMapper.toLinkBannerDto(saved);
   }
 
-
   private void validateImageParams(LinkBannerCreateRequest request) {
     if (Objects.isNull(request.imageFile()) && Objects.isNull(request.imageUrl())) {
       throw new ValidationException("Image url or file should be provided");
