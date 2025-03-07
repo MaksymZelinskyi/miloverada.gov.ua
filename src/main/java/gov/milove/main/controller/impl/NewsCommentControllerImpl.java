@@ -6,9 +6,9 @@ import gov.milove.main.domain.NewsComment;
 import gov.milove.main.domain.NewsCommenter;
 import gov.milove.main.domain.User;
 import gov.milove.main.dto.NewCommentDto;
-import gov.milove.main.repository.jpa.AppUserRepo;
-import gov.milove.main.repository.jpa.NewsCommentRepo;
-import gov.milove.main.repository.jpa.NewsCommenterRepo;
+import gov.milove.main.repository.jpa.AppUserRepository;
+import gov.milove.main.repository.jpa.NewsCommentRepository;
+import gov.milove.main.repository.jpa.NewsCommenterRepository;
 import gov.milove.main.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,9 +24,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NewsCommentControllerImpl implements NewsCommentController {
 
-    private final AppUserRepo appUserRepo;
-    private final NewsCommentRepo commentRepo;
-    private final NewsCommenterRepo newsCommenterRepo;
+    private final AppUserRepository appUserRepository;
+    private final NewsCommentRepository commentRepo;
+    private final NewsCommenterRepository newsCommenterRepository;
 
     @Override
     public List<NewsComment> getComments(Long newsId) {
@@ -43,12 +43,12 @@ public class NewsCommentControllerImpl implements NewsCommentController {
             if (dto.getNewsCommenter() == null) throw new IllegalArgumentException("authorId or newCommenter is not present");
             NewsCommenter dtoCommenter = dto.getNewsCommenter();
             dtoCommenter.setId(UUID.randomUUID().toString());
-            NewsCommenter savedCommenter = newsCommenterRepo.save(dtoCommenter);
+            NewsCommenter savedCommenter = newsCommenterRepository.save(dtoCommenter);
             log.info("saved commenter = {}", savedCommenter);
             author = savedCommenter;
         } else {
             log.info("user is registered, id = {}", appUserId);
-            author = appUserRepo.getReferenceById(appUserId);
+            author = appUserRepository.getReferenceById(appUserId);
         }
         log.info("author = {}", author);
 

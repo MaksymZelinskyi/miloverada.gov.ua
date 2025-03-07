@@ -19,6 +19,10 @@ import org.hibernate.validator.constraints.URL;
 @ToString
 public class LinkBanner extends Banner {
 
+    private String imageId;
+
+    private String imageUrl;
+
     @NotNull
     private String text;
 

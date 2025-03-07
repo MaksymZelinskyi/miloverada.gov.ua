@@ -6,7 +6,7 @@ import gov.milove.main.domain.AppUser;
 import gov.milove.main.domain.User;
 import gov.milove.main.dto.AdminMetadataDto;
 import gov.milove.main.dto.UserDto;
-import gov.milove.main.repository.jpa.AppUserRepo;
+import gov.milove.main.repository.jpa.AppUserRepository;
 import gov.milove.main.repository.mongo.AdminMetadataRepo;
 import gov.milove.main.util.Util;
 import jakarta.persistence.EntityExistsException;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AppUserController {
 
-    private final AppUserRepo appUserRepo;
+    private final AppUserRepository appUserRepository;
     private final AdminMetadataRepo adminMetadataRepo;
 
     @PersistenceContext
@@ -55,7 +55,7 @@ public class AppUserController {
                 .build();
 
         log.info("user - {}" , appUser);
-        AppUser saved = appUserRepo.save(appUser);
+        AppUser saved = appUserRepository.save(appUser);
         return saved.getId();
     }
 
@@ -77,23 +77,23 @@ public class AppUserController {
         }
 
         log.info("admin meta = {}", adminMetadata);
-        Boolean isExist = appUserRepo.existsById(userId);
+        Boolean isExist = appUserRepository.existsById(userId);
         log.info("user id - {}, isExist - {}", userId, isExist);
-        AppUser appUser =  appUserRepo.findById(encodedUserId).orElse(null);
+        AppUser appUser =  appUserRepository.findById(encodedUserId).orElse(null);
         log.info(appUser);
         return new UserDto(appUser != null ,adminMetadata, appUser);
     }
 
     @GetMapping("/protected/user/id/{id}")
     public AppUser getUserById(@PathVariable String id) {
-        return appUserRepo.findById(id).orElseThrow(EntityExistsException::new);
+        return appUserRepository.findById(id).orElseThrow(EntityExistsException::new);
     }
 
     @GetMapping("/protected/appUser/{id}")
     public UserDto getUserMetaById(@PathVariable String id) {
         log.info("user id {}", id);
         AdminMetadata adminMetadata = adminMetadataRepo.findById(id).orElse(null);
-        AppUser appUser = appUserRepo.findById(id).orElseThrow(EntityNotFoundException::new);
+        AppUser appUser = appUserRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         return new UserDto(adminMetadata, appUser);
     }
 

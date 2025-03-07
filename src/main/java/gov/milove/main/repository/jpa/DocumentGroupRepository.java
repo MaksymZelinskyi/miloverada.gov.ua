@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface DocumentGroupRepo extends JpaRepository<DocumentGroup, Long> {
+public interface DocumentGroupRepository extends JpaRepository<DocumentGroup, Long> {
 
     Optional<DocumentGroupWithGroupsDtoAndDocumentsDto> findDistinctById(Long id);
 

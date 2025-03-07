@@ -12,7 +12,4 @@ public class IllegalParameterException extends ControllerException {
         super(message);
     }
 
-    public IllegalParameterException(Throwable cause) {
-        super(cause);
-    }
 }

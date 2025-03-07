@@ -1,3 +1,7 @@
+
+
+app.image.base-url: http://localhost:6060/api/images/
+
 spring:
   config:
     import: "optional:application-dev-environment.properties"

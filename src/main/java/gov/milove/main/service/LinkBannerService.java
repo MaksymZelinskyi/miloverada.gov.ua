@@ -1,16 +1,18 @@
 package gov.milove.main.service;
 
-import gov.milove.main.domain.LinkBanner;
+import gov.milove.main.dto.LinkBannerDto;
+import gov.milove.main.dto.request.LinkBannerCreateRequest;
 import gov.milove.main.dto.request.LinkBannerUpdateRequest;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface LinkBannerService {
 
-  List<LinkBanner> findAllBanners();
+  Page<LinkBannerDto> findAllBanners(Pageable pageable);
 
-  LinkBanner save(LinkBanner linkBanner);
+  LinkBannerDto save(LinkBannerCreateRequest request, String userId);
 
-  LinkBanner update(LinkBannerUpdateRequest request);
+  LinkBannerDto update(LinkBannerUpdateRequest request);
 
   void deleteById(Long id);
 }

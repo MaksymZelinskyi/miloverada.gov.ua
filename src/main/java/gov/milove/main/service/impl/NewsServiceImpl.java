@@ -5,9 +5,9 @@ import gov.milove.main.domain.NewsType;
 import gov.milove.main.dto.NewsDtoWithImageAndType;
 import gov.milove.main.exception.NewsNotFoundException;
 import gov.milove.main.exception.NewsServiceException;
-import gov.milove.main.repository.jpa.NewsImageRepo;
+import gov.milove.main.repository.jpa.NewsImageRepository;
 import gov.milove.main.repository.jpa.NewsRepository;
-import gov.milove.main.repository.jpa.NewsTypeRepo;
+import gov.milove.main.repository.jpa.NewsTypeRepository;
 import gov.milove.main.service.NewsImagesService;
 import gov.milove.main.service.NewsService;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,11 +27,11 @@ public class NewsServiceImpl implements NewsService {
 
     private final NewsRepository newsRepository;
 
-    private final NewsTypeRepo newsTypeRepo;
+    private final NewsTypeRepository newsTypeRepository;
 
     private final NewsImagesService imageService;
 
-    private final NewsImageRepo newsImageRepo;
+    private final NewsImageRepository newsImageRepository;
 
     @Override
     public News save(News news, MultipartFile[] images, LocalDateTime dateOfPostponedPublication) {
@@ -61,7 +61,7 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public void deleteNewsImageById(String mongoId) {
         imageService.deleteFromMongoIfNotUsed(mongoId);
-        newsImageRepo.deleteByMongoImageId(mongoId);
+        newsImageRepository.deleteByMongoImageId(mongoId);
     }
 
     private void defineNewsType(NewsDtoWithImageAndType news, News entity) {
@@ -73,7 +73,7 @@ public class NewsServiceImpl implements NewsService {
             long newsTypeId = Long.parseLong(news.getNews_type_id());
             if (newsTypeId == 0) entity.setNewsType(null);
             else {
-                NewsType type = newsTypeRepo.findById(newsTypeId).orElseThrow(EntityNotFoundException::new);
+                NewsType type = newsTypeRepository.findById(newsTypeId).orElseThrow(EntityNotFoundException::new);
                 log.info(type);
                 entity.setNewsType(type);
             }

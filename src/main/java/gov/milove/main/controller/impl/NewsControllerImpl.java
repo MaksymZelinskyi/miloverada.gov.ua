@@ -10,7 +10,7 @@ import gov.milove.main.dto.NewsPageDto;
 import gov.milove.main.exception.IllegalParameterException;
 import gov.milove.main.exception.NewsNotFoundException;
 import gov.milove.main.repository.jpa.NewsRepository;
-import gov.milove.main.repository.jpa.NewsTypeRepo;
+import gov.milove.main.repository.jpa.NewsTypeRepository;
 import gov.milove.main.service.NewsImagesService;
 import gov.milove.main.service.NewsService;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,7 +36,7 @@ public class NewsControllerImpl implements NewsController {
 
     private final NewsService newsService;
     private final NewsRepository newsRepository;
-    private final NewsTypeRepo newsTypeRepo;
+    private final NewsTypeRepository newsTypeRepository;
     private final NewsImagesService newsImagesService;
 
     @Override
@@ -48,7 +48,7 @@ public class NewsControllerImpl implements NewsController {
 
     @Override
     public NewsType saveNewsType(NewsType newsType) {
-        return newsTypeRepo.save(newsType);
+        return newsTypeRepository.save(newsType);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class NewsControllerImpl implements NewsController {
         log.info("title = {}, dateOfPublication = {}, dateOfPostponedPublication = {}", title, dateOfPublication, dateOfPostponedPublication);
         log.info("newsType = {}", newsTypeId);
 
-        NewsType newsType = newsTypeId > 0 ? newsTypeRepo.findById(newsTypeId).orElseThrow(EntityNotFoundException::new) : null;
+        NewsType newsType = newsTypeId > 0 ? newsTypeRepository.findById(newsTypeId).orElseThrow(EntityNotFoundException::new) : null;
 
         News newNews = News.builder().description(title).main_text(text).dateOfPublication(dateOfPublication).newsType(newsType).views(0L).build();
 
@@ -71,13 +71,13 @@ public class NewsControllerImpl implements NewsController {
     @Override
     public void deleteNewsTypeById(Long id) {
         if (id <= 0) throw new IllegalParameterException("Id must be higher than zero");
-        newsTypeRepo.deleteById(id);
+        newsTypeRepository.deleteById(id);
     }
 
 
     @Override
     public List<NewsType> getNewsTypes() {
-        return newsTypeRepo.findAll();
+        return newsTypeRepository.findAll();
     }
 
 

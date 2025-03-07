@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
                             "/api/protected/**"
-                        ).hasRole(CONTENT_MANAGER_ROLE)
+                        ).hasAuthority("admin")
                         .anyRequest().permitAll())
                 .csrf().disable()
                 .cors(Customizer.withDefaults())

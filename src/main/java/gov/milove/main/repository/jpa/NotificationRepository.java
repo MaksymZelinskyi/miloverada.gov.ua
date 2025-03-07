@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface NotificationRepo extends JpaRepository<Notification, Long> {
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     @Query(value = "select (select count(*) from admin_notification) - ( select count(*)  from notification_view where user_id = :userId)", nativeQuery = true)
     Long getTotalNumberOfActualNotifications(@Param("userId") String userId);
