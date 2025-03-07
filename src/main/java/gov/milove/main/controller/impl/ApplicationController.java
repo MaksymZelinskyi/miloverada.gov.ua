@@ -27,7 +27,7 @@ public class ApplicationController {
   private final ApplicationService applicationService;
 
   @PostMapping("/application")
-  public ResponseEntity<Void> addApplication(@RequestBody ApplicationCreateRequest request) {
+  public ResponseEntity<Void> addApplication(@ModelAttribute ApplicationCreateRequest request) {
     List<ByteArrayResource> inputStreamResourceList = convertToInputStreamSource(request.files());
     applicationService.createApplication(request, inputStreamResourceList);
     return new ResponseEntity<>(HttpStatus.ACCEPTED);
