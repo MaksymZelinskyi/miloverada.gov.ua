@@ -1,4 +1,4 @@
-
+application.receiverEmail: a.liashenko@e-u.edu.ua
 app.image.base-url: https://api.miloverada.gov.ua/api/images/
 
 spring:

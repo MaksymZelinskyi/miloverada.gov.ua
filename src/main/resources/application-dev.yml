@@ -1,5 +1,5 @@
 
-
+application.receiverEmail: "a.liashenko@e-u.edu.ua"
 app.image.base-url: http://localhost:6060/api/images/
 
 spring:
