@@ -54,11 +54,6 @@ public class NewsControllerImpl implements NewsController {
     @Override
     @Transactional
     public ResponseEntity<Long> newNews(String title, String text, LocalDateTime dateOfPublication, LocalDateTime dateOfPostponedPublication, MultipartFile[] images, Long newsTypeId) {
-        log.info("CREATE NEWS");
-        log.info("images length = = {}", images.length);
-        log.info("title = {}, dateOfPublication = {}, dateOfPostponedPublication = {}", title, dateOfPublication, dateOfPostponedPublication);
-        log.info("newsType = {}", newsTypeId);
-
         NewsType newsType = newsTypeId > 0 ? newsTypeRepository.findById(newsTypeId).orElseThrow(EntityNotFoundException::new) : null;
 
         News newNews = News.builder().description(title).main_text(text).dateOfPublication(dateOfPublication).newsType(newsType).views(0L).build();

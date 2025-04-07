@@ -2,7 +2,7 @@ mail:
   host: smtp.gmail.com
   port: 587
   username: ${MAIL}
-  password: ${MAIL_PASSWORD}
+  password: "esfg wlli gotw wils"
   transport:
     protocol: smtp
   smtp:
@@ -10,3 +10,6 @@ mail:
     starttls:
       enable: true
   debug: true
+
+application:
+  receiverEmail: a.liashenko@e-u.edu.ua

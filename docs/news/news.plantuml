@@ -1,0 +1,80 @@
+@startuml
+
+
+skinparam linetype ortho
+
+
+
+
+together {
+  news_commenter --> news_comment
+  news_comment -->  news_comment
+
+  together {
+    news_type -->  news
+    news --> news_comment
+    news  --> news_image
+  }
+
+  together {
+    app_users --> news_commenter
+    app_users --> news
+  }
+}
+
+
+
+
+
+
+class app_users {
+   first_name: text
+   last_name: text
+   email: text
+   registered_on: timestamp
+   avatar_base64_image: text
+   avatar_content_type: text
+   avatar_url: text
+   id: text
+}
+
+class news {
+   description: text
+   main_text: text
+   date_of_publication: text
+   last_updated: text
+   is_banner: boolean
+   news_type_id: integer
+   addedBy : text
+   views: integer
+   image_id: text
+   id: integer
+}
+class news_comment {
+   news_id: integer
+   comment_id: integer
+   text: text
+   created_on: timestamp
+   author_id: text
+   edited_on: timestamp
+   id: integer
+}
+class news_commenter {
+   first_name: text
+   email: text
+   id: text
+}
+class news_image {
+   news_id: integer
+   mongo_image_id: text
+   file_name: text
+   id: integer
+}
+class news_type {
+   title: text
+   title_explanation: text
+   id: integer
+}
+
+
+@enduml
