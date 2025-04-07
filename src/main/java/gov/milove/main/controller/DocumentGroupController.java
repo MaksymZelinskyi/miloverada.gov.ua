@@ -3,6 +3,7 @@ package gov.milove.main.controller;
 import gov.milove.main.domain.Document;
 import gov.milove.main.dto.DocumentGroupWithGroupsDto;
 import gov.milove.main.dto.DocumentGroupWithGroupsDtoAndDocumentsDto;
+import gov.milove.main.dto.response.DocumentGroupDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
@@ -19,7 +20,7 @@ public interface DocumentGroupController {
 
     @Operation(summary = "Get the document list")
     @GetMapping("/documentGroup/all")
-    List<DocumentGroupWithGroupsDto> findAll();
+    List<DocumentGroupDto> findAll();
 
     @Operation(summary = "Create a subgroup of documents")
     @PostMapping("/protected/documentGroup/new")

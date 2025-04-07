@@ -3,8 +3,8 @@ package gov.milove.main.controller.impl;
 import gov.milove.main.controller.DocumentGroupController;
 import gov.milove.main.domain.Document;
 import gov.milove.main.domain.DocumentGroup;
-import gov.milove.main.dto.DocumentGroupWithGroupsDto;
 import gov.milove.main.dto.DocumentGroupWithGroupsDtoAndDocumentsDto;
+import gov.milove.main.dto.response.DocumentGroupDto;
 import gov.milove.main.exception.DocumentGroupNotFoundException;
 import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.service.DocumentGroupService;
@@ -28,8 +28,8 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
 
 
     @Override
-    public List<DocumentGroupWithGroupsDto> findAll() {
-        return documentGroupRepository.findDistinctByDocumentGroupIdOrderByCreatedOn(null);
+    public List<DocumentGroupDto> findAll() {
+        return documentGroupService.findAll();
     }
 
     @Override

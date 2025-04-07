@@ -28,6 +28,9 @@ public class DocumentGroup {
     @Size(min = 2, max = 1000)
     private String name;
 
+    @Column(name = "group_order")
+    private Long order;
+
     @ManyToOne
     @JsonIgnore
     private DocumentGroup documentGroup;

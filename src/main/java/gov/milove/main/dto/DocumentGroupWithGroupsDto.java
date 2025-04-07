@@ -13,4 +13,6 @@ public interface DocumentGroupWithGroupsDto {
     Date getCreatedOn();
 
     List<DocumentGroupWithGroupsDto> getGroups();
+
+    Long getOrder();
 }

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//move to forum
+
 @Log4j2
 @RestController
 @RequestMapping("/api")
