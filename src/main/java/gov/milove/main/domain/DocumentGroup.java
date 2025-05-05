@@ -35,8 +35,7 @@ public class DocumentGroup {
     @JsonIgnore
     private DocumentGroup documentGroup;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "document_group_id")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "documentGroup")
     @JsonIgnore
     private List<Document> documents = new ArrayList<>();
 

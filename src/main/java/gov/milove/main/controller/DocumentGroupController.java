@@ -1,44 +1,62 @@
 package gov.milove.main.controller;
 
 import gov.milove.main.domain.Document;
-import gov.milove.main.dto.DocumentGroupWithGroupsDto;
 import gov.milove.main.dto.DocumentGroupWithGroupsDtoAndDocumentsDto;
 import gov.milove.main.dto.response.DocumentGroupDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Tag(name = "Document group controller")
-@RequestMapping("/api")
-@Validated
 public interface DocumentGroupController {
 
     @Operation(summary = "Get the document list")
-    @GetMapping("/documentGroup/all")
     List<DocumentGroupDto> findAll();
 
     @Operation(summary = "Create a subgroup of documents")
-    @PostMapping("/protected/documentGroup/new")
-    DocumentGroupWithGroupsDtoAndDocumentsDto createNewSubGroup(@RequestParam(required = false) Long groupId, @NotBlank @RequestParam String name);
+    DocumentGroupWithGroupsDtoAndDocumentsDto createNewSubGroup(Long groupId, @NotBlank String name);
 
     @Operation(summary = "Edit a subgroup of documents")
-    @PutMapping("/protected/documentGroup/{id}/update")
-    Long editSubGroup(@PathVariable Long id, @NotBlank @RequestParam String name);
+    Long editSubGroup(Long id, @NotBlank String name);
 
     @Operation(summary = "Delete a subgroup of documents")
-    @DeleteMapping("/protected/documentGroup/{id}/delete")
-    Long deleteSubGroup(@PathVariable Long id);
+    ResponseEntity<Void> deleteSubGroup(Long id);
 
-    @Operation(summary = "Create a new document")
-    @PostMapping("/protected/documentGroup/{id}/document/new")
-    Document newDoc(@PathVariable Long id, @RequestParam MultipartFile file, @RequestParam String title);
+    @Operation(
+            summary = "Create a new document",
+            description = "Uploads a new document to the specified document group.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Document created successfully",
+                            content = @Content(schema = @Schema(implementation = Document.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+                    @ApiResponse(responseCode = "404", description = "Document group not found")
+            }
+    )
+    @Parameters({
+            @Parameter(name = "id", in = ParameterIn.PATH, required = true,
+                    description = "ID of the document group"),
+            @Parameter(name = "file", description = "The file to upload", required = true,
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            schema = @Schema(type = "string", format = "binary"))),
+            @Parameter(name = "title", description = "Title of the document", required = true,
+                    schema = @Schema(type = "string", example = "My Contract"))
+    })
+    Document newDoc(Long id, MultipartFile file, String title);
 
     @Operation(summary = "Find document group by id")
-    @GetMapping("/documentGroup/id/{id}")
-    DocumentGroupWithGroupsDtoAndDocumentsDto findById(@PathVariable Long id);
+    DocumentGroupWithGroupsDtoAndDocumentsDto findById(Long id);
 }
