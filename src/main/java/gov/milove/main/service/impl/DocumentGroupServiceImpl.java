@@ -42,14 +42,22 @@ public class DocumentGroupServiceImpl implements DocumentGroupService {
 
     public void deleteGroup(DocumentGroup documentGroup) {
         if (!documentGroup.getDocuments().isEmpty()) {
+            log.info("Delete documents in document group: {}", documentGroup.getId());
             documentService.deleteAll(documentGroup.getDocuments());
         }
         if (!documentGroup.getGroups().isEmpty()) {
-            for (DocumentGroup group : documentGroup.getGroups()) {
-                deleteGroup(group);
+            log.info("Delete sub groups in document group: {}", documentGroup.getId());
+            for (DocumentGroup childGroup : documentGroup.getGroups()) {
+                childGroup.setDocumentGroup(null);
+                deleteGroup(childGroup);
             }
         }
-        log.info("Delete document group by id: {}. {}", documentGroup.getId(), documentGroup);
-        documentGroupRepository.delete(documentGroup);
+        documentGroup.setDocumentGroup(null); //remove reference
+        documentGroupRepository.save(documentGroup);
+
+        DocumentGroup saved = documentGroupRepository.findById(documentGroup.getId())
+                .orElseThrow(EntityNotFoundException::new);
+        log.info("delete group: {}", saved);
+        documentGroupRepository.delete(saved);
     }
 }
