@@ -50,8 +50,6 @@ public class DocumentGroupServiceImpl implements DocumentGroupService {
             }
         }
         log.info("Delete document group by id: {}. {}", documentGroup.getId(), documentGroup);
-        log.info(documentGroup.getDocumentGroup().getId());
-        log.info(documentGroup.getGroups().size());
         documentGroupRepository.delete(documentGroup);
     }
 }
