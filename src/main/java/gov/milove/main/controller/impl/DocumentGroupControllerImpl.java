@@ -12,7 +12,9 @@ import gov.milove.main.service.DocumentService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -20,20 +22,25 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Log4j2
+@Validated
+@RequestMapping("/api")
 public class DocumentGroupControllerImpl implements DocumentGroupController {
 
     private final DocumentGroupRepository documentGroupRepository;
     private final DocumentGroupService documentGroupService;
     private final DocumentService documentService;
 
-
     @Override
+    @GetMapping("/documentGroup/all")
     public List<DocumentGroupDto> findAll() {
         return documentGroupService.findAll();
     }
 
     @Override
-    public DocumentGroupWithGroupsDtoAndDocumentsDto createNewSubGroup(Long groupId, String name) {
+    @PostMapping("/protected/documentGroup/new")
+    public DocumentGroupWithGroupsDtoAndDocumentsDto createNewSubGroup(
+            @RequestParam(required = false) Long groupId,
+            @RequestParam String name) {
 
         DocumentGroup documentGroup = DocumentGroup.builder().documentGroup(groupId == null ? null : documentGroupRepository.getReferenceById(groupId)).name(name).build();
         DocumentGroup saved = documentGroupRepository.save(documentGroup);
@@ -41,7 +48,9 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     }
 
     @Override
-    public Long editSubGroup(Long id, String name) {
+    @PutMapping("/protected/documentGroup/{id}/update")
+    public Long editSubGroup(@PathVariable Long id,
+                             @RequestParam String name) {
         DocumentGroup group = documentGroupRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         group.setName(name);
         documentGroupRepository.save(group);
@@ -49,20 +58,25 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     }
 
     @Override
-    public Long deleteSubGroup(Long id) {
-        log.info("delete = {}", id);
+    @DeleteMapping("/protected/documentGroup/{id}/delete")
+    public ResponseEntity<Void> deleteSubGroup(@PathVariable Long id) {
         documentGroupService.deleteById(id);
-        return id;
+        return ResponseEntity.noContent().build();
     }
 
     @Override
-    public Document newDoc(Long id, MultipartFile file, String title) {
-        log.info("new doc = {}, size - {}, title = {}", file.getOriginalFilename(), file.getSize(), title);
+    @PostMapping("/protected/documentGroup/{id}/document/new")
+    public Document newDoc(@PathVariable Long id,
+                           @RequestParam MultipartFile file,
+                           @RequestParam String title) {
+        log.info("Add new document, filename: {}, size: {}, title: {}", file.getOriginalFilename(),
+                file.getSize(), title);
         return documentService.saveDocument(id, file, title);
     }
 
     @Override
-    public DocumentGroupWithGroupsDtoAndDocumentsDto findById(Long id) {
+    @GetMapping("/documentGroup/id/{id}")
+    public DocumentGroupWithGroupsDtoAndDocumentsDto findById(@PathVariable Long id) {
         return documentGroupRepository.findDistinctById(id).orElseThrow(DocumentGroupNotFoundException::new);
     }
 }

@@ -40,6 +40,7 @@ public class Document {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @ToString.Exclude
+    @JoinColumn(name = "document_group_id")
     @JsonIgnoreProperties("hibernateLazyInitializer")
     private DocumentGroup documentGroup;
 

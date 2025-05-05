@@ -2,6 +2,7 @@ package gov.milove.main.service.impl;
 
 import gov.milove.main.domain.DocumentGroup;
 import gov.milove.main.dto.response.DocumentGroupDto;
+import gov.milove.main.exception.DocumentGroupNotFoundException;
 import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.service.DocumentGroupService;
 import gov.milove.main.service.DocumentService;
@@ -26,9 +27,9 @@ public class DocumentGroupServiceImpl implements DocumentGroupService {
 
     @Override
     public void deleteById(Long id) {
-       log.info("DELETE DOCUMENT GROUP - {}", id);
-
-        DocumentGroup documentGroup = documentGroupRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+       log.info("Delete document group by id: {}", id);
+        DocumentGroup documentGroup = documentGroupRepository.findById(id).orElseThrow(
+                () -> new DocumentGroupNotFoundException("Document group with id: %s is not found".formatted(id)));
         deleteGroup(documentGroup);
     }
 
@@ -48,7 +49,9 @@ public class DocumentGroupServiceImpl implements DocumentGroupService {
                 deleteGroup(group);
             }
         }
-
+        log.info("Delete document group by id: {}. {}", documentGroup.getId(), documentGroup);
+        log.info(documentGroup.getDocumentGroup().getId());
+        log.info(documentGroup.getGroups().size());
         documentGroupRepository.delete(documentGroup);
     }
 }
