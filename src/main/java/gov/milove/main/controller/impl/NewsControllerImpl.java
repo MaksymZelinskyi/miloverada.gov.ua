@@ -22,14 +22,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 @Log4j2
 @RequiredArgsConstructor
 public class NewsControllerImpl implements NewsController {
@@ -40,28 +42,41 @@ public class NewsControllerImpl implements NewsController {
     private final NewsImagesService newsImagesService;
 
     @Override
+    @GetMapping("/news/all")
     public List<INewsDto> newsAll(Integer page, Integer size) {
-
-        return newsRepository.findDistinctBy(PageRequest.of(page, size).withSort(Sort.Direction.DESC, "dateOfPublication")).toList();
-
+        return newsRepository
+                .findDistinctBy(PageRequest.of(page, size)
+                        .withSort(Sort.Direction.DESC, "dateOfPublication"))
+                .toList();
     }
 
     @Override
+    @PostMapping("/protected/newsType/new")
     public NewsType saveNewsType(NewsType newsType) {
         return newsTypeRepository.save(newsType);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Long> newNews(String title, String text, LocalDateTime dateOfPublication, LocalDateTime dateOfPostponedPublication, MultipartFile[] images, Long newsTypeId) {
+    @PostMapping("/protected/news/new")
+    public ResponseEntity<Long> newNews(String title, String text, LocalDateTime dateOfPublication,
+                                        LocalDateTime dateOfPostponedPublication, MultipartFile[] images,
+                                        Long newsTypeId) {
         log.info("CREATE NEWS");
         log.info("images length = = {}", images.length);
         log.info("title = {}, dateOfPublication = {}, dateOfPostponedPublication = {}", title, dateOfPublication, dateOfPostponedPublication);
         log.info("newsType = {}", newsTypeId);
 
-        NewsType newsType = newsTypeId > 0 ? newsTypeRepository.findById(newsTypeId).orElseThrow(EntityNotFoundException::new) : null;
+        NewsType newsType = newsTypeId > 0 ? newsTypeRepository.
+                findById(newsTypeId).orElseThrow(EntityNotFoundException::new) : null;
 
-        News newNews = News.builder().description(title).main_text(text).dateOfPublication(dateOfPublication).newsType(newsType).views(0L).build();
+        News newNews = News.builder()
+                .description(title)
+                .main_text(text)
+                .dateOfPublication(dateOfPublication)
+                .newsType(newsType)
+                .views(0L)
+                .build();
 
         News news = newsService.save(newNews, images, dateOfPostponedPublication);
 
@@ -69,6 +84,7 @@ public class NewsControllerImpl implements NewsController {
     }
 
     @Override
+    @DeleteMapping("/protected/newsType/{id}/delete")
     public void deleteNewsTypeById(Long id) {
         if (id <= 0) throw new IllegalParameterException("Id must be higher than zero");
         newsTypeRepository.deleteById(id);
@@ -76,21 +92,21 @@ public class NewsControllerImpl implements NewsController {
 
 
     @Override
+    @GetMapping("/protected/news-types")
     public List<NewsType> getNewsTypes() {
         return newsTypeRepository.findAll();
     }
 
 
     @Override
+    @DeleteMapping("/protected/news/{id}/delete")
     public ResponseEntity<Long> deleteNewsById(Long id) {
         if (id <= 0) throw new IllegalParameterException("Id must be higher than zero");
-        if (id <= 0) throw new IllegalParameterException("Id must be higher than zero");
-        newsService.deleteById(id);
         newsService.deleteById(id);
         return ResponseEntity.accepted().body(id);
     }
 
-
+    @DeleteMapping("/protected/news/image/{id}/delete")
     public ResponseEntity<String> deleteNewsImageById(String id) {
         if (!ObjectId.isValid(id)) throw new IllegalParameterException("Image id hex string is not valid");
         newsService.deleteNewsImageById(id);
@@ -98,6 +114,7 @@ public class NewsControllerImpl implements NewsController {
     }
 
     @Override
+    @PutMapping("/protected/news/{id}/update")
     public ResponseEntity<Long> updateNews(Long id, String title, String text, LocalDateTime dateOfPublication) {
         log.info("title = {}, text = {}, date = {}", title, text, dateOfPublication);
         News news = newsRepository.findById(id).orElseThrow(NewsNotFoundException::new);
@@ -109,6 +126,7 @@ public class NewsControllerImpl implements NewsController {
     }
 
     @Override
+    @PostMapping("/protected/news/{newsId}/image/new")
     public List<NewsImage> saveNewNewsImage(Long newsId, MultipartFile[] files) {
         News news = newsRepository.findById(newsId).orElseThrow(NewsNotFoundException::new);
         List<NewsImage> newsImages = newsImagesService.saveAll(List.of(files));
@@ -117,30 +135,41 @@ public class NewsControllerImpl implements NewsController {
         return newsImages;
     }
 
+    @GetMapping("/news/{newsId}")
     public News getNewsById(Long newsId) {
         return newsRepository.findById(newsId).orElseThrow(NewsNotFoundException::new);
     }
 
     @Override
+    @GetMapping("/news/{newsId}/similar")
     public List<INewsDto> getSimilarNewsByNewsId(Long newsId) {
         News news = newsRepository.findById(newsId).orElseThrow(NewsNotFoundException::new);
 
-        return (news.getNewsType() != null ? newsRepository.getLastNewsDTOByNewsTypeIdWithLimit(newsId, news.getNewsType().getId(), PageRequest.of(0, 3).withSort(Sort.Direction.DESC, "dateOfPublication")).toList() : List.of());
+        return (news.getNewsType() != null ? newsRepository
+                .getLastNewsDTOByNewsTypeIdWithLimit(newsId, news.getNewsType().getId(), PageRequest.of(0, 3)
+                        .withSort(Sort.Direction.DESC, "dateOfPublication")).toList() : List.of());
     }
 
     @Override
+    @GetMapping("/news/latest")
     public NewsPageDto getLatest(Integer pageSize, Integer pageNumber) {
-        Page<INewsDto> newsDtos = newsRepository.findDistinctBy(PageRequest.ofSize(pageSize).withPage(pageNumber).withSort(Sort.Direction.DESC, "dateOfPublication"));
+        Page<INewsDto> newsDtos = newsRepository
+                .findDistinctBy(PageRequest.ofSize(pageSize)
+                        .withPage(pageNumber)
+                        .withSort(Sort.Direction.DESC, "dateOfPublication"));
         return new NewsPageDto(newsDtos);
     }
 
     @Override
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/news/update")
     public ResponseEntity<String> updateNews(NewsDtoWithImageAndType news) {
         newsService.update(news);
         return new ResponseEntity<>("Оновлення успішне", HttpStatus.OK);
     }
 
     @Override
+    @PostMapping("/news/{id}/incrementViews")
     public Long incrementViews(Long id) {
         newsRepository.incrementViews(id);
         return id;
