@@ -65,7 +65,7 @@ public class NewsServiceImpl implements NewsService {
     }
 
     private void defineNewsType(NewsDtoWithImageAndType news, News entity) {
-        if (news.getNews_type_id().isEmpty()) {
+        if (news.getNews_type_id() == null || news.getNews_type_id().isEmpty()) {
             if (news.getTypeTitle() != null && news.getTitleExplanation() != null){
                 entity.setNewsType(new NewsType(news.getTypeTitle(), news.getTitleExplanation()));
             }
