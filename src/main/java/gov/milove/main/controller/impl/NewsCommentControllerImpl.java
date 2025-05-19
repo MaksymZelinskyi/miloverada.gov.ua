@@ -29,18 +29,21 @@ public class NewsCommentControllerImpl implements NewsCommentController {
     private final NewsCommenterRepository newsCommenterRepository;
 
     @Override
+    @GetMapping("/news/{newsId}/comments")
     public List<NewsComment> getComments(Long newsId) {
         return commentRepo.findAllByNewsIdOrderByCreatedOnDesc(newsId);
     }
 
     @Override
+    @PostMapping("/news/comment/new")
     public NewsComment newComment(NewCommentDto dto) {
-        String appUserId =  Util.decodeUriComponent(dto.getAppUserId());
+        String appUserId = Util.decodeUriComponent(dto.getAppUserId());
         log.info("new comment, newsId = {}, appUserId = {}, newsCommenter = {}, commentId = {}, text = {}", dto.getNewsId(), appUserId, dto.getNewsCommenter(), dto.getCommentId(), dto.getText());
         User author;
 
         if (appUserId == null) {
-            if (dto.getNewsCommenter() == null) throw new IllegalArgumentException("authorId or newCommenter is not present");
+            if (dto.getNewsCommenter() == null)
+                throw new IllegalArgumentException("authorId or newCommenter is not present");
             NewsCommenter dtoCommenter = dto.getNewsCommenter();
             dtoCommenter.setId(UUID.randomUUID().toString());
             NewsCommenter savedCommenter = newsCommenterRepository.save(dtoCommenter);
@@ -67,6 +70,7 @@ public class NewsCommentControllerImpl implements NewsCommentController {
     }
 
     @Override
+    @DeleteMapping("/protected/news/comment/{id}/delete")
     public Long delete(Long id) {
         commentRepo.deleteById(id);
         return id;
