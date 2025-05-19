@@ -3,12 +3,10 @@ package gov.milove.main.controller.impl;
 import gov.milove.main.controller.DocumentController;
 import gov.milove.main.domain.Document;
 import gov.milove.main.dto.DocumentWithGroupDto;
-import gov.milove.main.repository.jpa.DocumentRepository;
 import gov.milove.main.service.DocumentService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,27 +15,26 @@ import java.util.List;
 @Log4j2
 public class DocumentControllerImpl implements DocumentController {
 
-    private final DocumentRepository documentRepository;
     private final DocumentService documentService;
 
     @Override
     public Long updateDocumentName(Long id, String name) {
         log.info("update doc = {}, name - {}", id, name);
-        Document document = documentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Document document = documentService.getDocument(id);
         document.setTitle(name);
-        documentRepository.save(document);
+        documentService.saveDocument(document);
         return id;
     }
 
     @Override
     public Document deleteDocument(Long id) {
-        Document document = documentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Document document = documentService.getDocument(id);
         documentService.delete(document);
         return document;
     }
 
     @Override
-    public List<DocumentWithGroupDto> searchDocs(String encodedString)  {
-        return documentRepository.searchDistinctByNameContainingIgnoreCaseOrTitleContainingIgnoreCase(encodedString, encodedString);
+    public List<DocumentWithGroupDto> searchDocs(String encodedString) {
+        return documentService.searchDocument(encodedString);
     }
 }

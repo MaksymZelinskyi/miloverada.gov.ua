@@ -3,6 +3,7 @@ package gov.milove.main.service.impl;
 import gov.milove.main.domain.Document;
 import gov.milove.main.domain.DocumentGroup;
 import gov.milove.main.domain.MongoDocument;
+import gov.milove.main.dto.DocumentWithGroupDto;
 import gov.milove.main.exception.ServiceException;
 import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.repository.jpa.DocumentRepository;
@@ -76,6 +77,20 @@ public class DocumentServiceImpl implements DocumentService {
         }
     }
 
+    @Override
+    public Document getDocument(Long id) {
+        return documentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Override
+    public Document saveDocument(Document document) {
+        return documentRepository.save(document);
+    }
+
+    @Override
+    public List<DocumentWithGroupDto> searchDocument(String encodedString) {
+        return documentRepository.searchDistinctByNameContainingIgnoreCaseOrTitleContainingIgnoreCase(encodedString, encodedString);
+    }
 
     private Document save(Long groupId, MultipartFile file, String title) {
         try {
