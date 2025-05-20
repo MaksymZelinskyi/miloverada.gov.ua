@@ -9,24 +9,19 @@ import java.util.List;
 
 @Tag(name="Contact employee controller")
 @RestController
-@RequestMapping("/api")
 public interface ContactEmployeeController {
 
     @Operation(summary = "Get the available employees")
-    @GetMapping("/contacts")
     List<ContactEmployee> getAll();
 
     @Operation(summary = "Add an employee")
-    @PostMapping("/protected/contact/new")
     ContactEmployee create(@RequestBody ContactEmployee employee);
 
     @Operation(summary = "Update an employee")
-    @PostMapping("/contact/update")
     Long update(
             @RequestParam("id") Long id,
             @RequestBody ContactEmployee updatedEmployee);
 
     @Operation(summary = "Delete an employee")
-    @DeleteMapping("/protected/contact/{id}/delete")
     Long delete(@PathVariable Long id);
 }
