@@ -13,12 +13,13 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Log4j2
 public class NotificationControllerImpl implements NotificationController {
@@ -28,6 +29,7 @@ public class NotificationControllerImpl implements NotificationController {
     private final NotificationViewRepository viewRepo;
 
     @Override
+    @GetMapping("/protected/admin/notification/totalNumber")
     public Long getTotalNumberOfActualNotifications(String encodedUserId) {
         String userId = Util.decodeUriComponent(encodedUserId);
         log.info("Get total number of notifications");
@@ -36,6 +38,7 @@ public class NotificationControllerImpl implements NotificationController {
     }
 
     @Override
+    @GetMapping("/protected/admin/notification/all")
     public List<NotificationDtoWithViews> getAll(String encodedUserId) {
         String userId = Util.decodeUriComponent(encodedUserId);
         log.info("Get All notification");
@@ -43,6 +46,7 @@ public class NotificationControllerImpl implements NotificationController {
     }
 
     @Override
+    @GetMapping("/protected/admin/notification/{id}")
     public Notification getById(Long id, Boolean isViewed, String encodedUserId) {
         if (!isViewed) {
             String userId = Util.decodeUriComponent(encodedUserId);
@@ -53,6 +57,7 @@ public class NotificationControllerImpl implements NotificationController {
     }
 
     @Override
+    @PostMapping("/protected/admin/notification/new")
     public Notification createNew(NewNotificationDto n) {
         log.info("new notification - {}", n);
         Notification saved = repo.save(new Notification(n.getMessage(), n.getText(), appUserRepository.getReferenceById(n.getAuthorId())));
@@ -62,8 +67,8 @@ public class NotificationControllerImpl implements NotificationController {
     }
 
 
-    //Rename if it doesn't affect the front-end part
     @Override
+    @PutMapping("/protected/admin/notification/{id}/edit")
     public Notification createNew(NewNotificationDto n, Long id) {
         log.info("edit notification! {} id = {}", n, id);
         Notification notification = repo.findById(id).orElseThrow(EntityNotFoundException::new);
@@ -72,9 +77,10 @@ public class NotificationControllerImpl implements NotificationController {
         return repo.save(notification);
     }
 
-    //Rename if it doesn't affect the front-end part
+
     @Override
     @Transactional
+    @DeleteMapping("/protected/admin/notification/{id}/delete")
     public Long createNew(Long id) {
         log.info("Delete a notification {}", id);
         viewRepo.deleteAllByNotificationId(id);
