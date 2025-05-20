@@ -5,6 +5,7 @@ import gov.milove.main.domain.Document;
 import gov.milove.main.domain.DocumentGroup;
 import gov.milove.main.dto.DocumentGroupWithGroupsDto;
 import gov.milove.main.dto.DocumentGroupWithGroupsDtoAndDocumentsDto;
+import gov.milove.main.dto.request.SaveDocumentRequestDto;
 import gov.milove.main.exception.DocumentGroupNotFoundException;
 import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.service.DocumentGroupService;
@@ -58,7 +59,7 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     @Override
     public Document newDoc(Long id, MultipartFile file, String title) {
         log.info("new doc = {}, size - {}, title = {}", file.getOriginalFilename(), file.getSize(), title);
-        return documentService.saveDocument(id, file, title);
+        return documentService.saveDocument(new SaveDocumentRequestDto(id, file, title));
     }
 
     @Override

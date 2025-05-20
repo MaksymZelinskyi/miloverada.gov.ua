@@ -4,6 +4,7 @@ import gov.milove.main.domain.Document;
 import gov.milove.main.domain.DocumentGroup;
 import gov.milove.main.domain.MongoDocument;
 import gov.milove.main.dto.DocumentWithGroupDto;
+import gov.milove.main.dto.request.SaveDocumentRequestDto;
 import gov.milove.main.exception.ServiceException;
 import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.repository.jpa.DocumentRepository;
@@ -33,19 +34,19 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentGroupRepository groupRepository;
 
     @Override
-    public Document saveDocument(Long groupId, MultipartFile file, String title) {
-        Optional<Document> documentOpt = documentRepository.findByHashCode(file.hashCode());
-        log.info("save or get document with filename - {}", file.getOriginalFilename());
+    public Document saveDocument(SaveDocumentRequestDto request) {
+        Optional<Document> documentOpt = documentRepository.findByHashCode(request.file().hashCode());
+        log.info("save or get document with filename - {}", request.file().getOriginalFilename());
         if (documentOpt.isPresent()) {
             log.info("document already exists");
             Document document = documentOpt.get();
-            document.setTitle(title);
-            document.setName(file.getOriginalFilename());
-            addToGroupAndReturn(documentOpt.get(), groupId);
+            document.setTitle(request.title());
+            document.setName(request.file().getOriginalFilename());
+            addToGroupAndReturn(documentOpt.get(), request.groupId());
             return document;
         }
 
-        return save(groupId, file, title);
+        return save(request);
     }
 
     private void addToGroupAndReturn(Document document, Long groupId) {
@@ -92,20 +93,21 @@ public class DocumentServiceImpl implements DocumentService {
         return documentRepository.searchDistinctByNameContainingIgnoreCaseOrTitleContainingIgnoreCase(encodedString, encodedString);
     }
 
-    private Document save(Long groupId, MultipartFile file, String title) {
+    private Document save(SaveDocumentRequestDto request) {
         try {
             log.info("a document doesn't exist");
-            byte[] bytes = file.getBytes();
+            byte[] bytes = request.file().getBytes();
 
-            MongoDocument mongoDocument = new MongoDocument(file.getOriginalFilename(), new Binary(bytes), file.getContentType());
+            MongoDocument mongoDocument = new MongoDocument(request.file().getOriginalFilename(),
+                    new Binary(bytes), request.file().getContentType());
             MongoDocument savedMongo = mongoDocumentRepo.save(mongoDocument);
             log.info("document saved to mongo = {}", savedMongo);
 
             Document document = Document.builder()
                     .mongoId(savedMongo.getId())
-                    .documentGroup(groupRepository.getReferenceById(groupId))
-                    .name(file.getOriginalFilename())
-                    .title(title)
+                    .documentGroup(groupRepository.getReferenceById(request.groupId()))
+                    .name(request.file().getOriginalFilename())
+                    .title(request.title())
                     .hashCode(Arrays.hashCode(bytes))
                     .build();
             Document savedDoc = documentRepository.save(document);
