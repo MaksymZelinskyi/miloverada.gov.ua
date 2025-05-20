@@ -13,13 +13,14 @@ import gov.milove.main.service.DocumentService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 @Log4j2
 public class DocumentGroupControllerImpl implements DocumentGroupController {
 
@@ -29,11 +30,13 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
 
 
     @Override
+    @GetMapping("/documentGroup/all")
     public List<DocumentGroupWithGroupsDto> findAll() {
         return documentGroupRepository.findDistinctByDocumentGroupIdOrderByCreatedOn(null);
     }
 
     @Override
+    @PostMapping("/protected/documentGroup/new")
     public DocumentGroupWithGroupsDtoAndDocumentsDto createNewSubGroup(Long groupId, String name) {
 
         DocumentGroup documentGroup = DocumentGroup.builder().documentGroup(groupId == null ? null : documentGroupRepository.getReferenceById(groupId)).name(name).build();
@@ -42,6 +45,7 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     }
 
     @Override
+    @PutMapping("/protected/documentGroup/{id}/update")
     public Long editSubGroup(Long id, String name) {
         DocumentGroup group = documentGroupRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         group.setName(name);
@@ -50,6 +54,7 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     }
 
     @Override
+    @DeleteMapping("/protected/documentGroup/{id}/delete")
     public Long deleteSubGroup(Long id) {
         log.info("delete = {}", id);
         documentGroupService.deleteById(id);
@@ -57,12 +62,14 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     }
 
     @Override
+    @PostMapping("/protected/documentGroup/{id}/document/new")
     public Document newDoc(Long id, MultipartFile file, String title) {
         log.info("new doc = {}, size - {}, title = {}", file.getOriginalFilename(), file.getSize(), title);
         return documentService.saveDocument(new SaveDocumentRequestDto(id, file, title));
     }
 
     @Override
+    @GetMapping("/documentGroup/id/{id}")
     public DocumentGroupWithGroupsDtoAndDocumentsDto findById(Long id) {
         return documentGroupRepository.findDistinctById(id).orElseThrow(DocumentGroupNotFoundException::new);
     }
