@@ -20,4 +20,5 @@ public interface DocumentService {
     Document saveDocument(Document document);
 
     List<DocumentWithGroupDto> searchDocument(String encodedString);
+
 }

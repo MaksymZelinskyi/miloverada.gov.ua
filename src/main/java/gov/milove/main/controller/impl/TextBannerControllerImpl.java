@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,11 +23,13 @@ public class TextBannerControllerImpl implements TextBannerController {
     private final TextBannerRepository repo;
 
     @Override
+    @GetMapping("/all")
     public List<TextBanner> getAll() {
         return repo.findAll(Sort.by("createdOn").descending());
     }
 
     @Override
+    @PostMapping("/new")
     public ResponseEntity<Long> createBanner(TextBanner banner) {
         if (repo.exists(Example.of(banner))) {
             return ResponseEntity.status(CONFLICT).build();
@@ -37,8 +39,8 @@ public class TextBannerControllerImpl implements TextBannerController {
         }
     }
 
-
     @Override
+    @PutMapping("/update")
     public ResponseEntity<?> update(TextBanner banner) {
         if (banner.getId() == null) return ResponseEntity.badRequest().build();
         TextBanner saved = repo.findById(banner.getId()).orElseThrow(EntityNotFoundException::new);
@@ -50,6 +52,7 @@ public class TextBannerControllerImpl implements TextBannerController {
     }
 
     @Override
+    @DeleteMapping("/delete")
     public ResponseEntity<?> delete(Long id) {
         repo.deleteById(id);
         return ResponseEntity.ok().build();

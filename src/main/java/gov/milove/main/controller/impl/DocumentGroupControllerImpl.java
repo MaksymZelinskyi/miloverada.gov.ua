@@ -38,19 +38,13 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     @Override
     @PostMapping("/protected/documentGroup/new")
     public DocumentGroupWithGroupsDtoAndDocumentsDto createNewSubGroup(Long groupId, String name) {
-
-        DocumentGroup documentGroup = DocumentGroup.builder().documentGroup(groupId == null ? null : documentGroupRepository.getReferenceById(groupId)).name(name).build();
-        DocumentGroup saved = documentGroupRepository.save(documentGroup);
-        return documentGroupRepository.findDistinctById(saved.getId()).orElseThrow(EntityNotFoundException::new);
+        return documentGroupService.saveSubGroup(groupId, name);
     }
 
     @Override
     @PutMapping("/protected/documentGroup/{id}/update")
     public Long editSubGroup(Long id, String name) {
-        DocumentGroup group = documentGroupRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        group.setName(name);
-        documentGroupRepository.save(group);
-        return group.getId();
+        return documentGroupService.editSubGroup(id, name);
     }
 
     @Override

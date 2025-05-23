@@ -13,18 +13,15 @@ import java.util.List;
 public interface TextBannerController {
 
     @Operation(summary = "Get all text banners")
-    @GetMapping("/all")
     List<TextBanner> getAll();
 
     @Operation(summary = "Create text banner")
-    @PostMapping("/new")
     ResponseEntity<Long> createBanner(@RequestBody TextBanner banner);
 
     @Operation(summary = "Update text banner")
-    @PutMapping("/update")
     ResponseEntity update(@RequestBody TextBanner banner);
 
     @Operation(summary = "Delete text banner")
-    @DeleteMapping("/delete")
     ResponseEntity delete(@RequestParam("id") Long id);
+
 }

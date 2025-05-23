@@ -1,6 +1,7 @@
 package gov.milove.main.service.impl;
 
 import gov.milove.main.domain.DocumentGroup;
+import gov.milove.main.dto.DocumentGroupWithGroupsDtoAndDocumentsDto;
 import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.service.DocumentGroupService;
 import gov.milove.main.service.DocumentService;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class DocumentGroupServiceImpl implements DocumentGroupService {
 
     private final DocumentGroupRepository documentGroupRepository;
-
     private final DocumentService documentService;
 
     @Override
@@ -26,7 +26,7 @@ public class DocumentGroupServiceImpl implements DocumentGroupService {
         deleteGroup(documentGroup);
     }
 
-    public void deleteGroup(DocumentGroup documentGroup) {
+    private void deleteGroup(DocumentGroup documentGroup) {
         if (!documentGroup.getDocuments().isEmpty()) {
             documentService.deleteAll(documentGroup.getDocuments());
         }
@@ -38,4 +38,20 @@ public class DocumentGroupServiceImpl implements DocumentGroupService {
 
         documentGroupRepository.delete(documentGroup);
     }
+
+    @Override
+    public DocumentGroupWithGroupsDtoAndDocumentsDto saveSubGroup(Long groupId, String name) {
+        DocumentGroup documentGroup = DocumentGroup.builder().documentGroup(groupId == null ? null : documentGroupRepository.getReferenceById(groupId)).name(name).build();
+        DocumentGroup saved = documentGroupRepository.save(documentGroup);
+        return documentGroupRepository.findDistinctById(saved.getId()).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Override
+    public Long editSubGroup(Long id, String name) {
+        DocumentGroup group = documentGroupRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        group.setName(name);
+        documentGroupRepository.save(group);
+        return group.getId();
+    }
+
 }
