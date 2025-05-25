@@ -1,8 +1,11 @@
 package gov.milove.main.service.impl;
 
 import gov.milove.main.domain.News;
+import gov.milove.main.domain.NewsImage;
 import gov.milove.main.domain.NewsType;
 import gov.milove.main.dto.NewsDtoWithImageAndType;
+import gov.milove.main.dto.request.NewsCreateRequest;
+import gov.milove.main.dto.request.NewsUpdateRequest;
 import gov.milove.main.exception.NewsNotFoundException;
 import gov.milove.main.exception.NewsServiceException;
 import gov.milove.main.repository.jpa.NewsImageRepository;
@@ -10,6 +13,7 @@ import gov.milove.main.repository.jpa.NewsRepository;
 import gov.milove.main.repository.jpa.NewsTypeRepository;
 import gov.milove.main.service.NewsImagesService;
 import gov.milove.main.service.NewsService;
+import gov.milove.main.util.mapper.NewsMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -32,6 +36,8 @@ public class NewsServiceImpl implements NewsService {
     private final NewsImagesService imageService;
 
     private final NewsImageRepository newsImageRepository;
+
+    private final NewsMapper newsMapper;
 
     @Override
     public News save(News news, MultipartFile[] images, LocalDateTime dateOfPostponedPublication) {
@@ -58,6 +64,14 @@ public class NewsServiceImpl implements NewsService {
         newsRepository.save(saved);
     }
 
+    public void updateNewsContent(NewsUpdateRequest req) {
+        News news = newsRepository.findById(req.id()).orElseThrow(NewsNotFoundException::new);
+        news.setDescription(req.title());
+        news.setDateOfPublication(req.dateOfPublication());
+        news.setMain_text(req.text());
+        newsRepository.save(news);
+    }
+
     @Override
     public void deleteNewsImageById(String mongoId) {
         imageService.deleteFromMongoIfNotUsed(mongoId);
@@ -66,7 +80,7 @@ public class NewsServiceImpl implements NewsService {
 
     private void defineNewsType(NewsDtoWithImageAndType news, News entity) {
         if (news.getNews_type_id() == null || news.getNews_type_id().isEmpty()) {
-            if (news.getTypeTitle() != null && news.getTitleExplanation() != null){
+            if (news.getTypeTitle() != null && news.getTitleExplanation() != null) {
                 entity.setNewsType(new NewsType(news.getTypeTitle(), news.getTitleExplanation()));
             }
         } else {
@@ -78,6 +92,23 @@ public class NewsServiceImpl implements NewsService {
                 entity.setNewsType(type);
             }
         }
+    }
+
+    public News createNews(NewsCreateRequest req) {
+        NewsType newsType = req.newsTypeId() > 0 ? newsTypeRepository
+                .findById(req.newsTypeId())
+                .orElseThrow(EntityNotFoundException::new) : null;
+
+        News news = newsMapper.toNews(req);
+        return save(news, req.images(), req.dateOfPostponedPublication());
+    }
+
+    public List<NewsImage> addImagesToNews(Long newsId, MultipartFile[] files) {
+        News news = newsRepository.findById(newsId).orElseThrow(NewsNotFoundException::new);
+        List<NewsImage> newsImages = imageService.saveAll(List.of(files));
+        news.getImages().addAll(newsImages);
+        newsRepository.save(news);
+        return newsImages;
     }
 
 }

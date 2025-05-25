@@ -6,6 +6,8 @@ import gov.milove.main.domain.NewsType;
 import gov.milove.main.dto.INewsDto;
 import gov.milove.main.dto.NewsDtoWithImageAndType;
 import gov.milove.main.dto.NewsPageDto;
+import gov.milove.main.dto.request.NewsCreateRequest;
+import gov.milove.main.dto.request.NewsUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
@@ -30,13 +32,7 @@ public interface NewsController {
     NewsType saveNewsType(@Validated @RequestBody NewsType newsType);
 
     @Operation(summary = "Add news")
-    ResponseEntity<Long> newNews(@RequestParam @NotBlank @Size(max = 300) String title,
-                                 @RequestParam @NotBlank String text,
-                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateOfPublication,
-                                 @RequestParam(required = false) @Future @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateOfPostponedPublication,
-                                 @RequestParam @NotEmpty @Size(max = 20) MultipartFile[] images,
-                                 @RequestParam Long newsTypeId
-    );
+    ResponseEntity<Long> newNews(@Validated NewsCreateRequest req);
 
     @Operation(summary = "Delete news type")
     void deleteNewsTypeById(@PathVariable Long id);
@@ -51,10 +47,7 @@ public interface NewsController {
     ResponseEntity<String> deleteNewsImageById(@PathVariable String id);
 
     @Operation(summary = "Update news")
-    ResponseEntity<Long> updateNews(@PathVariable Long id,
-                                    @RequestParam @NotBlank @Size(max = 300) String title,
-                                    @RequestParam @NotBlank String text,
-                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateOfPublication);
+    ResponseEntity<Long> updateNews(@Validated NewsUpdateRequest req);
 
     @Operation(summary = "Add news image")
     List<NewsImage> saveNewNewsImage(@PathVariable Long newsId,

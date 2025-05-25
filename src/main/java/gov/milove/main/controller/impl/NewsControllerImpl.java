@@ -7,13 +7,13 @@ import gov.milove.main.domain.NewsType;
 import gov.milove.main.dto.INewsDto;
 import gov.milove.main.dto.NewsDtoWithImageAndType;
 import gov.milove.main.dto.NewsPageDto;
+import gov.milove.main.dto.request.NewsCreateRequest;
+import gov.milove.main.dto.request.NewsUpdateRequest;
 import gov.milove.main.exception.IllegalParameterException;
 import gov.milove.main.exception.NewsNotFoundException;
 import gov.milove.main.repository.jpa.NewsRepository;
 import gov.milove.main.repository.jpa.NewsTypeRepository;
-import gov.milove.main.service.NewsImagesService;
 import gov.milove.main.service.NewsService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.bson.types.ObjectId;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -39,7 +38,6 @@ public class NewsControllerImpl implements NewsController {
     private final NewsService newsService;
     private final NewsRepository newsRepository;
     private final NewsTypeRepository newsTypeRepository;
-    private final NewsImagesService newsImagesService;
 
     @Override
     @GetMapping("/news/all")
@@ -59,28 +57,13 @@ public class NewsControllerImpl implements NewsController {
     @Override
     @Transactional
     @PostMapping("/protected/news/new")
-    public ResponseEntity<Long> newNews(String title, String text, LocalDateTime dateOfPublication,
-                                        LocalDateTime dateOfPostponedPublication, MultipartFile[] images,
-                                        Long newsTypeId) {
+    public ResponseEntity<Long> newNews(NewsCreateRequest req) {
         log.info("CREATE NEWS");
-        log.info("images length = = {}", images.length);
-        log.info("title = {}, dateOfPublication = {}, dateOfPostponedPublication = {}", title, dateOfPublication, dateOfPostponedPublication);
-        log.info("newsType = {}", newsTypeId);
+        log.info("images length = = {}", req.images().length);
+        log.info("title = {}, dateOfPublication = {}, dateOfPostponedPublication = {}", req.title(), req.dateOfPublication(), req.dateOfPostponedPublication());
+        log.info("newsType = {}", req.newsTypeId());
 
-        NewsType newsType = newsTypeId > 0 ? newsTypeRepository.
-                findById(newsTypeId).orElseThrow(EntityNotFoundException::new) : null;
-
-        News newNews = News.builder()
-                .description(title)
-                .main_text(text)
-                .dateOfPublication(dateOfPublication)
-                .newsType(newsType)
-                .views(0L)
-                .build();
-
-        News news = newsService.save(newNews, images, dateOfPostponedPublication);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(news.getId());
+        return ResponseEntity.ok().body(newsService.createNews(req).getId());
     }
 
     @Override
@@ -115,24 +98,17 @@ public class NewsControllerImpl implements NewsController {
 
     @Override
     @PutMapping("/protected/news/{id}/update")
-    public ResponseEntity<Long> updateNews(Long id, String title, String text, LocalDateTime dateOfPublication) {
-        log.info("title = {}, text = {}, date = {}", title, text, dateOfPublication);
-        News news = newsRepository.findById(id).orElseThrow(NewsNotFoundException::new);
-        news.setDescription(title);
-        news.setDateOfPublication(dateOfPublication);
-        news.setMain_text(text);
-        newsRepository.save(news);
-        return ResponseEntity.accepted().body(id);
+    public ResponseEntity<Long> updateNews(NewsUpdateRequest req) {
+        log.info("title = {}, text = {}, date = {}", req.title(), req.text(), req.dateOfPublication());
+        newsService.updateNewsContent(req);
+
+        return ResponseEntity.accepted().body(req.id());
     }
 
     @Override
     @PostMapping("/protected/news/{newsId}/image/new")
     public List<NewsImage> saveNewNewsImage(Long newsId, MultipartFile[] files) {
-        News news = newsRepository.findById(newsId).orElseThrow(NewsNotFoundException::new);
-        List<NewsImage> newsImages = newsImagesService.saveAll(List.of(files));
-        news.getImages().addAll(newsImages);
-        newsRepository.save(news);
-        return newsImages;
+        return newsService.addImagesToNews(newsId, files);
     }
 
     @GetMapping("/news/{newsId}")
