@@ -94,6 +94,7 @@ public class NewsServiceImpl implements NewsService {
         }
     }
 
+    @Override
     public News createNews(NewsCreateRequest req) {
         NewsType newsType = req.newsTypeId() > 0 ? newsTypeRepository
                 .findById(req.newsTypeId())
@@ -103,6 +104,7 @@ public class NewsServiceImpl implements NewsService {
         return save(news, req.images(), req.dateOfPostponedPublication());
     }
 
+    @Override
     public List<NewsImage> addImagesToNews(Long newsId, MultipartFile[] files) {
         News news = newsRepository.findById(newsId).orElseThrow(NewsNotFoundException::new);
         List<NewsImage> newsImages = imageService.saveAll(List.of(files));

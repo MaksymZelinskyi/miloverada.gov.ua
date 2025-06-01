@@ -86,14 +86,14 @@ public class NewsControllerImpl implements NewsController {
     public ResponseEntity<Long> deleteNewsById(Long id) {
         if (id <= 0) throw new IllegalParameterException("Id must be higher than zero");
         newsService.deleteById(id);
-        return ResponseEntity.accepted().body(id);
+        return ResponseEntity.ok().body(id);
     }
 
     @DeleteMapping("/protected/news/image/{id}/delete")
     public ResponseEntity<String> deleteNewsImageById(String id) {
         if (!ObjectId.isValid(id)) throw new IllegalParameterException("Image id hex string is not valid");
         newsService.deleteNewsImageById(id);
-        return ResponseEntity.accepted().body(id);
+        return ResponseEntity.ok().body(id);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class NewsControllerImpl implements NewsController {
         log.info("title = {}, text = {}, date = {}", req.title(), req.text(), req.dateOfPublication());
         newsService.updateNewsContent(req);
 
-        return ResponseEntity.accepted().body(req.id());
+        return ResponseEntity.ok().body(req.id());
     }
 
     @Override
