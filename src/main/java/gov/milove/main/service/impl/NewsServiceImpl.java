@@ -1,18 +1,25 @@
 package gov.milove.main.service.impl;
 
 import gov.milove.main.domain.News;
+import gov.milove.main.domain.NewsComment;
 import gov.milove.main.domain.NewsType;
 import gov.milove.main.dto.NewsDtoWithImageAndType;
+import gov.milove.main.dto.SimilarNewsDtoResponse;
 import gov.milove.main.exception.NewsNotFoundException;
 import gov.milove.main.exception.NewsServiceException;
+import gov.milove.main.repository.jpa.NewsCommentRepository;
 import gov.milove.main.repository.jpa.NewsImageRepository;
 import gov.milove.main.repository.jpa.NewsRepository;
 import gov.milove.main.repository.jpa.NewsTypeRepository;
 import gov.milove.main.service.NewsImagesService;
 import gov.milove.main.service.NewsService;
+import gov.milove.main.util.mapper.NewsMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,6 +40,10 @@ public class NewsServiceImpl implements NewsService {
 
     private final NewsImageRepository newsImageRepository;
 
+    private final NewsCommentRepository newsCommentRepository;
+
+    private final NewsMapper newsMapper;
+
     @Override
     public News save(News news, MultipartFile[] images, LocalDateTime dateOfPostponedPublication) {
         news.setImages(imageService.saveAll(List.of(images)));
@@ -44,8 +55,14 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public void deleteById(Long id) {
+        log.info("Delete news by id: {}", id);
         News news = newsRepository.findById(id).orElseThrow(NewsNotFoundException::new);
         imageService.deleteAllIfNotUsed(news.getImages());
+
+        List<NewsComment> comments = newsCommentRepository.findAllByNewsIdOrderByCreatedOnDesc(id);
+        log.info("Delete news comments: {}", comments.size());
+        newsCommentRepository.deleteAll(comments);
+
         newsRepository.delete(news);
     }
 
@@ -62,6 +79,27 @@ public class NewsServiceImpl implements NewsService {
     public void deleteNewsImageById(String mongoId) {
         imageService.deleteFromMongoIfNotUsed(mongoId);
         newsImageRepository.deleteByMongoImageId(mongoId);
+    }
+
+    @Override
+    public List<SimilarNewsDtoResponse> findSimilarNewsByNewsType(Long newsId) {
+        News news = newsRepository.findById(newsId).orElseThrow(NewsNotFoundException::new);
+        log.info("News with id {} found, type: {}", newsId, news.getNewsType());
+
+        if (news.getNewsType() == null) {
+            log.info("News with id {} has no type, returning empty list", newsId);
+            return List.of();
+        }
+        PageRequest pageRequest = PageRequest.of(0, 3)
+                .withSort(Sort.Direction.DESC, "dateOfPublication");
+
+        Page<News> similarNews = newsRepository.findAllByNewsType(news.getNewsType(), pageRequest);
+        log.info("Found {} similar news for news with id {}", similarNews.getTotalElements(), newsId);
+
+        return similarNews.stream()
+                .map(newsMapper::toSimilarNewsDtoResponse)
+                .filter((similarNewsDtoResponse) -> !similarNewsDtoResponse.id().equals(newsId))
+                .toList();
     }
 
     private void defineNewsType(NewsDtoWithImageAndType news, News entity) {

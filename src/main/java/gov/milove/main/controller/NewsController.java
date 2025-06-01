@@ -6,8 +6,10 @@ import gov.milove.main.domain.NewsType;
 import gov.milove.main.dto.INewsDto;
 import gov.milove.main.dto.NewsDtoWithImageAndType;
 import gov.milove.main.dto.NewsPageDto;
+import gov.milove.main.dto.SimilarNewsDtoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -79,7 +81,7 @@ public interface NewsController {
 
     @Operation(summary = "Get similar news by id")
     @GetMapping("/news/{newsId}/similar")
-    List<INewsDto> getSimilarNewsByNewsId(@PathVariable Long newsId);
+    ResponseEntity<List<SimilarNewsDtoResponse>> getSimilarNewsByNewsId(@PathVariable @Valid @Positive Long newsId);
 
     @Operation(summary = "Get the most recent news")
     @GetMapping("/news/latest")

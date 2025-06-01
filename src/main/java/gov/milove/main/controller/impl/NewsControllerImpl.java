@@ -7,6 +7,7 @@ import gov.milove.main.domain.NewsType;
 import gov.milove.main.dto.INewsDto;
 import gov.milove.main.dto.NewsDtoWithImageAndType;
 import gov.milove.main.dto.NewsPageDto;
+import gov.milove.main.dto.SimilarNewsDtoResponse;
 import gov.milove.main.exception.IllegalParameterException;
 import gov.milove.main.exception.NewsNotFoundException;
 import gov.milove.main.repository.jpa.NewsRepository;
@@ -79,8 +80,6 @@ public class NewsControllerImpl implements NewsController {
     @Override
     public ResponseEntity<Long> deleteNewsById(Long id) {
         if (id <= 0) throw new IllegalParameterException("Id must be higher than zero");
-        if (id <= 0) throw new IllegalParameterException("Id must be higher than zero");
-        newsService.deleteById(id);
         newsService.deleteById(id);
         return ResponseEntity.accepted().body(id);
     }
@@ -117,10 +116,10 @@ public class NewsControllerImpl implements NewsController {
     }
 
     @Override
-    public List<INewsDto> getSimilarNewsByNewsId(Long newsId) {
-        News news = newsRepository.findById(newsId).orElseThrow(NewsNotFoundException::new);
-
-        return (news.getNewsType() != null ? newsRepository.getLastNewsDTOByNewsTypeIdWithLimit(newsId, news.getNewsType().getId(), PageRequest.of(0, 3).withSort(Sort.Direction.DESC, "dateOfPublication")).toList() : List.of());
+    public ResponseEntity<List<SimilarNewsDtoResponse>> getSimilarNewsByNewsId(Long newsId) {
+        log.info("Fetching similar news for newsId: {}", newsId);
+        List<SimilarNewsDtoResponse> responses = newsService.findSimilarNewsByNewsType(newsId);
+        return ResponseEntity.ok(responses);
     }
 
     @Override

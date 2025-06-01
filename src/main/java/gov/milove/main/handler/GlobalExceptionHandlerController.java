@@ -49,7 +49,7 @@ public class GlobalExceptionHandlerController {
   @ExceptionHandler(value = {EntityNotFoundException.class})
   public ResponseEntity<ErrorMessage> handleNotFoundException(RuntimeException ex,
                                                               HttpServletRequest request) {
-    log.error(NOT_FOUND_MESSAGE, ex.getMessage(), request.getMethod(), request.getRequestURI());
+    log.error(NOT_FOUND_MESSAGE, ex.getMessage(), request.getMethod(), request.getRequestURI(), ex);
 
     return new ResponseEntity<>(new ErrorMessage("Entity not found"), HttpStatus.NOT_FOUND);
   }
