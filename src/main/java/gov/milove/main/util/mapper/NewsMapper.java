@@ -2,7 +2,6 @@ package gov.milove.main.util.mapper;
 
 import gov.milove.main.domain.News;
 import gov.milove.main.dto.request.NewsCreateRequest;
-import gov.milove.main.dto.request.NewsUpdateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

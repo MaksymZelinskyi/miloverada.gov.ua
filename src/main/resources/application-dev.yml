@@ -1,5 +1,5 @@
 
-
+application.receiverEmail: "a.liashenko@e-u.edu.ua"
 app.image.base-url: http://localhost:6060/api/images/
 
 spring:
@@ -53,10 +53,10 @@ server:
   tomcat:
     max-http-form-post-size: 50000000
 
-logging:
-  level:
-    root: INFO
-    gov.milove: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm} [%X{traceId}] %-5level %logger{36} - %msg%n"
+#logging:
+#  level:
+#    root: INFO
+#    gov.milove: INFO
+#  pattern:
+#    console: "%d{yyyy-MM-dd HH:mm} [%X{traceId}] %-5level %logger{36} - %msg%n"
 

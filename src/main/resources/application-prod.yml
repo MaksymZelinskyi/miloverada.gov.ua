@@ -1,4 +1,5 @@
-
+application:
+  receiverEmail: miloveadmin@ukr.net
 app.image.base-url: https://api.miloverada.gov.ua/api/images/
 
 spring:

@@ -3,7 +3,7 @@ package gov.milove.main.controller;
 import gov.milove.main.domain.Notification;
 import gov.milove.main.dto.NewNotificationDto;
 import gov.milove.main.dto.NotificationDtoWithViews;
-import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations .Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;

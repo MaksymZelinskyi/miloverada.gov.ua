@@ -1,0 +1,164 @@
+@startuml
+
+top to bottom direction
+skinparam linetype ortho
+
+
+together {
+chat                  -->  forum_users
+chat_members          -->  chat
+chat_members          -->  forum_users
+forum_users           -->  app_users
+forwarded_message     -->  chat
+forwarded_message     -->  message
+forwarded_message     -->  message
+message               -->  chat
+message               -->  forum_users
+message_file          -->  file
+message_file          -->  message
+message_image         -->  message
+
+post                  -->  forum_users
+post_comments         -->  forum_users
+post_comments         -->  post
+post_comments         -->  post_comments
+post_likes            -->  forum_users
+post_likes            -->  post
+private_chat          -->  chat
+private_chat          -->  forum_users
+private_chat          -->  forum_users
+replied_message       -->  message              : "id"
+replied_message       -->  message              : "replied_message_id:id"
+replied_message       -->  replied_message      : "replied_message_id:id"
+story                 -->  forum_users          : "author_id:id"
+unread_messages       -->  chat                 : "chat_id:id"
+unread_messages       -->  forum_users          : "user_id:id"
+unread_messages       -->  message              : "message_id:id"
+user_chat             -->  chat                 : "chat_id:id"
+user_chat             -->  forum_users          : "user_id:id"
+
+}
+
+
+class app_users {
+   first_name: text
+   last_name: text
+   email: text
+   registered_on: timestamp
+   avatar_base64_image: text
+   avatar_content_type: text
+   avatar_url: text
+   id: text
+}
+class chat {
+   name: text
+   description: text
+   picture: text
+   owner_id: text
+   created_on: timestamp
+   is_private: boolean
+   id_alias: text
+   id: integer
+}
+class chat_members {
+   member_id: text
+   chat_id: integer
+   id: integer
+}
+class file {
+   mongo_file_id: text
+   size: integer
+   name: text
+   format: text
+   hash_code: text
+   is_large: boolean
+   id: integer
+}
+class forum_users {
+   avatar: text
+   registered_on: timestamp
+   nickname: text
+   app_user_id: text
+   about_me: text
+   is_online: boolean
+   last_was_online: timestamp
+   id: text
+}
+class forwarded_message {
+   forwarded_message_id: integer
+   from_chat_id: integer
+   message_id: integer
+}
+class message {
+   text: text
+   sender_id: text
+   created_on: timestamp
+   edited_on: timestamp
+   chat_id: integer
+   id: integer
+}
+class message_file {
+   file_id: integer
+   message_id: integer
+   id: integer
+}
+class message_image {
+   image_id: text
+   message_id: integer
+   hash_code: integer
+   last_loaded: timestamp
+   id: integer
+}
+
+class post {
+   author_id: text
+   text: text
+   image_id: text
+   created_on: timestamp
+   id: integer
+}
+class post_comments {
+   text: text
+   author_id: text
+   created_on: timestamp
+   post_id: integer
+   id: integer
+}
+class post_likes {
+   post_id: integer
+   user_id: text
+   id: integer
+}
+class private_chat {
+   chat_id: integer
+   user1_id: text
+   user2_id: text
+   id: integer
+}
+class replied_message {
+   replied_message_id: integer
+   id: integer
+}
+class story {
+   author_id: text
+   text: text
+   image_id: text
+   created_on: timestamp
+   id: integer
+}
+
+class unread_messages {
+   chat_id: integer
+   user_id: text
+   message_id: integer
+   id: integer
+}
+class user_chat {
+   chat_id: integer
+   user_id: text
+   last_visited_on: timestamp
+   id: integer
+}
+
+
+@enduml

@@ -1,29 +1,28 @@
-package gov.milove.main.controller;
+package gov.milove.main.handler;
 
-import gov.milove.main.exception.AppUserNotFoundException;
-import gov.milove.main.exception.DocumentGroupNotFoundException;
-import gov.milove.main.exception.ExceptionDetails;
-import gov.milove.main.exception.FileNotFoundException;
-import gov.milove.main.exception.IllegalParameterException;
-import gov.milove.main.exception.ImageNotFoundException;
-import gov.milove.main.exception.LinkBannerNotFoundException;
-import gov.milove.main.exception.NewsNotFoundException;
-import gov.milove.main.exception.ServiceException;
-import gov.milove.main.exception.ValidationException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import gov.milove.main.exception.*;
+import gov.milove.main.repository.jpa.DocumentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -33,18 +32,26 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @RequiredArgsConstructor
 @Log4j2
-public class ExceptionHandlerController {
+public class GlobalExceptionHandlerController {
 
-  @ExceptionHandler(value = {DocumentGroupNotFoundException.class, FileNotFoundException.class,
-      AppUserNotFoundException.class, ImageNotFoundException.class,
-      LinkBannerNotFoundException.class,
-      NewsNotFoundException.class})
-  public ResponseEntity<String> handleNotFoundException(RuntimeException ex,
+  private static final String NOT_FOUND_MESSAGE = "Response code: 404 (not found). Message: '{}'. FROM: {} {}";
+
+  @ExceptionHandler(value = {DocumentGroupNotFoundException.class,
+          FileNotFoundException.class, AppUserNotFoundException.class, ImageNotFoundException.class,
+      LinkBannerNotFoundException.class, DocumentNotFoundException.class, NewsNotFoundException.class})
+  public ResponseEntity<ErrorMessage> handleCustomNotFoundException(RuntimeException ex,
       HttpServletRequest request) {
-    log.error("Response code: 404 (not found). Message: '{}'. FROM: {} {}",
-        ex.getMessage(), request.getMethod(), request.getRequestURI());
+    log.error(NOT_FOUND_MESSAGE, ex.getMessage(), request.getMethod(), request.getRequestURI());
 
-    return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(new ErrorMessage(ex.getMessage()), HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(value = {EntityNotFoundException.class})
+  public ResponseEntity<ErrorMessage> handleNotFoundException(RuntimeException ex,
+                                                              HttpServletRequest request) {
+    log.error(NOT_FOUND_MESSAGE, ex.getMessage(), request.getMethod(), request.getRequestURI(), ex);
+
+    return new ResponseEntity<>(new ErrorMessage("Entity not found"), HttpStatus.NOT_FOUND);
   }
 
   @ExceptionHandler(ServiceException.class)
@@ -54,6 +61,19 @@ public class ExceptionHandlerController {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
   }
 
+  @ExceptionHandler({MultipartException.class, MissingServletRequestParameterException.class})
+  public ResponseEntity<String> handleBadRequest(RuntimeException ex) {
+    log.error("Bad request error", ex);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  }
+
+  @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+  public ResponseEntity<ErrorMessage> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex,
+                                                                             HttpServletRequest request) {
+    String message = "Request with path '%s' does not supported with method '%s'".formatted(request.getRequestURI(),
+            ex.getMethod());
+    return badRequest(message);
+  }
 
   @ExceptionHandler(value = {ValidationException.class, IllegalParameterException.class})
   public ResponseEntity<String> handleObjectNotValidException(RuntimeException ex,
@@ -98,11 +118,17 @@ public class ExceptionHandlerController {
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleRuntimeException(Exception ex,
-      HttpServletRequest request) {
+  public ResponseEntity<ErrorMessage> handleRuntimeException(Exception ex,
+                                                             HttpServletRequest request) {
     log.error("Response code: 500 (internal). Message: '{}'. FROM: {} {}",
-        ex.getMessage(), request.getMethod(), request.getRequestURI(), ex);
+            ex.getMessage(), request.getMethod(), request.getRequestURI(), ex);
 
-    return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorMessage("Internal Server Error. Unexpected Error."));
+  }
+
+  private ResponseEntity<ErrorMessage> badRequest(String message) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorMessage(message));
   }
 }

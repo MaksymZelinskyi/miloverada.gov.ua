@@ -28,12 +28,14 @@ public class DocumentGroup {
     @Size(min = 2, max = 1000)
     private String name;
 
+    @Column(name = "group_order")
+    private Long order;
+
     @ManyToOne
     @JsonIgnore
     private DocumentGroup documentGroup;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "document_group_id")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "documentGroup")
     @JsonIgnore
     private List<Document> documents = new ArrayList<>();
 

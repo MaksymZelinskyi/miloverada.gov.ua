@@ -5,6 +5,7 @@ import gov.milove.main.dto.DocumentWithGroupDto;
 import gov.milove.main.dto.request.SaveDocumentRequestDto;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface DocumentService {

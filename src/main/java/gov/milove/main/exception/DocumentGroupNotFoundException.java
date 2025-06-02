@@ -9,7 +9,4 @@ public class DocumentGroupNotFoundException extends RuntimeException{
         super(message);
     }
 
-    public DocumentGroupNotFoundException(Throwable cause) {
-        super(cause);
-    }
 }

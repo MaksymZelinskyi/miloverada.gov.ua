@@ -6,6 +6,8 @@ package gov.milove.main.constants;
  */
 public class Constants {
 
+  public static final String APPLICATION_NOTIFY_DESTINATION = "/topic/application-sent/%s";
+
   public static final String CONTENT_MANAGER_ROLE = "content_manager";
 
   public static final String TRACE_ID_KEY = "traceId";
