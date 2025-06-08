@@ -32,7 +32,7 @@ public class ApplicationServiceImpl implements ApplicationService {
   private final TemplateEngine templateEngine;
   private final SimpMessagingTemplate messagingTemplate;
 
-  @Value("${application.receiverEmail}")
+  @Value("${application.email.receiver}")
   private String APPLICATION_RECEIVER_EMAIL;
 
   private final String SUBJECT_PREFIX = "Звернення від ";

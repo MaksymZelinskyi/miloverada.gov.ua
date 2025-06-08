@@ -1,9 +1,13 @@
 package gov.milove.main.controller.impl;
 
 import gov.milove.main.controller.DocumentController;
+import gov.milove.main.domain.Action;
 import gov.milove.main.domain.Document;
+import gov.milove.main.domain.DocumentRetrieval;
 import gov.milove.main.dto.DocumentWithGroupDto;
+import gov.milove.main.exception.DocumentGroupNotFoundException;
 import gov.milove.main.repository.jpa.DocumentRepository;
+import gov.milove.main.repository.jpa.DocumentStatisticsRepository;
 import gov.milove.main.service.DocumentService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
@@ -21,12 +25,13 @@ public class DocumentControllerImpl implements DocumentController {
 
     private final DocumentRepository documentRepository;
     private final DocumentService documentService;
+    private final DocumentStatisticsRepository documentStatsRepository;
 
     @Override
     @PutMapping("/protected/document/{id}/update")
     public Long updateDocumentName(@PathVariable Long id, @RequestParam String name) {
         log.info("update doc = {}, name - {}", id, name);
-        Document document = documentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Document document = documentService.getById(id);
         document.setTitle(name);
         documentRepository.save(document);
         return id;
@@ -43,5 +48,12 @@ public class DocumentControllerImpl implements DocumentController {
     @GetMapping("/documents/search")
     public List<DocumentWithGroupDto> searchDocs(@RequestParam(name = "docName")  String encodedString)  {
         return documentRepository.searchDistinctByNameContainingIgnoreCaseOrTitleContainingIgnoreCase(encodedString, encodedString);
+    }
+
+    @Override
+    @PostMapping("/documents/{id}/view")
+    public void markAsViewed(@PathVariable Long id) {
+        Document document = documentService.getById(id);
+        documentStatsRepository.save(new DocumentRetrieval(document, Action.VIEW));
     }
 }

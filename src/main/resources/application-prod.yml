@@ -1,7 +1,6 @@
-application:
-  receiverEmail: miloveadmin@ukr.net
-app.image.base-url: https://api.miloverada.gov.ua/api/images/
-
+app:
+  image:
+    base-url: http://localhost:6060/api/images/
 spring:
   config:
     import: "optional:application-prod-environment.properties"

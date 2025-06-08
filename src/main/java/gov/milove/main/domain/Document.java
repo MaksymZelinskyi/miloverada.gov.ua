@@ -44,6 +44,9 @@ public class Document {
     @JsonIgnoreProperties("hibernateLazyInitializer")
     private DocumentGroup documentGroup;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User addedBy;
+
     public Document(Long id, String title, String name) {
         this.id = id;
         this.title = title;

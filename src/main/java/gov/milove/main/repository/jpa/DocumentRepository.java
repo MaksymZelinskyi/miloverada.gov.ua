@@ -17,4 +17,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     boolean documentUsedMoreThenOneTime(@Param("name") String name);
 
     List<DocumentWithGroupDto> searchDistinctByNameContainingIgnoreCaseOrTitleContainingIgnoreCase(String title, String name);
+
+    Optional<Document> findByName(String name);
 }

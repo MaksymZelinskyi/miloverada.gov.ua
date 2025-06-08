@@ -1,5 +1,6 @@
 package gov.milove.main.service.impl;
 
+import gov.milove.main.domain.AppUser;
 import gov.milove.main.domain.Document;
 import gov.milove.main.domain.DocumentGroup;
 import gov.milove.main.domain.MongoDocument;
@@ -9,6 +10,7 @@ import gov.milove.main.exception.ValidationException;
 import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.repository.jpa.DocumentRepository;
 import gov.milove.main.repository.mongo.MongoDocumentRepo;
+import gov.milove.main.service.AppUserService;
 import gov.milove.main.service.DocumentService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,8 @@ public class DocumentServiceImpl implements DocumentService {
     private final MongoDocumentRepo mongoDocumentRepo;
 
     private final DocumentGroupRepository groupRepository;
+
+    private final AppUserService appUserService;
 
     @Override
     public void deleteById(Long id) {
@@ -121,19 +125,29 @@ public class DocumentServiceImpl implements DocumentService {
             MongoDocument savedMongo = mongoDocumentRepo.save(mongoDocument);
             log.info("document saved to mongo = {}", savedMongo);
 
+            AppUser user = appUserService.getCurrentUser();
             Document document = Document.builder()
                     .mongoId(savedMongo.getId())
                     .documentGroup(groupRepository.getReferenceById(groupId))
                     .name(file.getOriginalFilename())
                     .title(title)
                     .hashCode(Arrays.hashCode(bytes))
+                    .addedBy(user)
                     .build();
             Document savedDoc = documentRepository.save(document);
-            log.info("Document saved - {}", document);
+             log.info("Document saved - {}", document);
             return savedDoc;
         } catch (IOException e) {
             log.info("Document save error: {}", e.getMessage());
             throw new ServiceException("Document save error", e);
         }
+    }
+
+    public Document getById(Long id) {
+        return documentRepository.findById(id).orElseThrow(() -> new DocumentNotFoundException("Document with id " + id + " not found"));
+    }
+
+    public Document getByName(String name) {
+        return documentRepository.findByName(name).orElseThrow(() -> new DocumentNotFoundException("Document with name " + name + "not found"));
     }
 }
