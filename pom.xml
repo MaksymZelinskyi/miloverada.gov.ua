@@ -254,6 +254,14 @@
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-maven-plugin</artifactId>
         <version>9.8.3</version>
+          <configuration>
+              <url>jdbc:postgresql://localhost:5432/milove</url>
+              <user>postgres</user>
+              <password>AtoPonis</password>
+              <locations>
+                  <location>filesystem:src/main/resources/db/migration</location>
+              </locations>
+          </configuration>
       </plugin>
 
       <plugin>
