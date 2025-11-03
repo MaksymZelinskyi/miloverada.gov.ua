@@ -41,4 +41,9 @@ public interface DocumentController {
 
     @Operation(summary = "Search a document")
     List<DocumentWithGroupDto> searchDocs(String encodedString);
+
+    @Operation(summary = "Add a document view",
+            description = "Should be invoked when the document with the id specified is viewed for the sake of analytics"
+    )
+    void markAsViewed(@PathVariable Long id);
 }

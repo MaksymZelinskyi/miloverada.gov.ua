@@ -1,13 +1,13 @@
 package gov.milove.main.controller.impl;
 
 import gov.milove.main.controller.Upload;
-import gov.milove.main.domain.Image;
-import gov.milove.main.domain.MongoDocument;
-import gov.milove.main.domain.MongoNewsImage;
+import gov.milove.main.domain.*;
 import gov.milove.main.exception.ImageNotFoundException;
 import gov.milove.main.repository.mongo.ImageRepo;
 import gov.milove.main.repository.mongo.MongoDocumentRepo;
 import gov.milove.main.repository.mongo.NewsImagesMongoRepo;
+import gov.milove.main.service.DocumentService;
+import gov.milove.main.service.impl.DocumentStatsService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URLEncoder;
@@ -35,6 +35,8 @@ public class UploadImpl implements Upload {
 
   private final MongoDocumentRepo mongoDocumentRepo;
   private final ImageRepo imageRepo;
+  private final DocumentStatsService documentStatsService;
+  private final DocumentService documentService;
 
   @Override
   @GetMapping("/download/image/{id}")
@@ -78,6 +80,9 @@ public class UploadImpl implements Upload {
 
     }
     Binary mongoFile = mongoDocument.getFile();
+
+    Document document = documentService.getByName(fileName);
+    documentStatsService.save(new DocumentRetrieval(document, Action.DOWNLOAD));
 
     String encodedFilename = URLEncoder.encode(mongoDocument.getFilename(), StandardCharsets.UTF_8);
     String contentDisposition = "attachment; filename=\"" + encodedFilename + "\"";

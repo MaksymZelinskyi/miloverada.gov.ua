@@ -14,4 +14,5 @@ public class GlobalExceptionHandler {
     public void handleNotFound(final HttpServletRequest request, final Exception error) {
 
     }
+
 }

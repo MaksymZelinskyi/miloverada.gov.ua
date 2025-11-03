@@ -1,15 +1,19 @@
-mail:
-  host: smtp.gmail.com
-  port: 587
-  username: ${MAIL}
-  password: "esfg wlli gotw wils"
-  transport:
-    protocol: smtp
-  smtp:
-    auth: true
-    starttls:
-      enable: true
-  debug: true
+spring:
+  config:
+    import: "optional:application-prod-environment.properties"
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_SENDER}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 application:
-  receiverEmail: a.liashenko@e-u.edu.ua
+  email:
+    receiver: ${MAIL_RECEIVER}
+    sender: ${MAIL_SENDER}

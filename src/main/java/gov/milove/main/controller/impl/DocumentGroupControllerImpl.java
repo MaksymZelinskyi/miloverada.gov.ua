@@ -3,6 +3,7 @@ package gov.milove.main.controller.impl;
 import gov.milove.main.controller.DocumentGroupController;
 import gov.milove.main.domain.Document;
 import gov.milove.main.domain.DocumentGroup;
+import gov.milove.main.domain.DocumentRetrieval;
 import gov.milove.main.dto.DocumentGroupWithGroupsDtoAndDocumentsDto;
 import gov.milove.main.dto.response.DocumentGroupDto;
 import gov.milove.main.exception.DocumentGroupNotFoundException;
@@ -79,4 +80,5 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     public DocumentGroupWithGroupsDtoAndDocumentsDto findById(@PathVariable Long id) {
         return documentGroupRepository.findDistinctById(id).orElseThrow(DocumentGroupNotFoundException::new);
     }
+
 }

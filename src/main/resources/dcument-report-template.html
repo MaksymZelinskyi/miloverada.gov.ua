@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: auto;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            text-align: center;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        .positive {
+            color: green;
+            font-weight: bold;
+        }
+
+        .negative {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+<h1>
+    Document report for the period:
+    <span th:text="${start}"></span> -
+    <span th:text="${end}"></span>
+</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Document ID</th>
+        <th>Document Title</th>
+        <th>Document Group</th>
+        <th>Downloads</th>
+        <th>Downloads Δ (%)</th>
+        <th>Views</th>
+        <th>Views Δ (%)</th>
+        <th>Added by</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="doc : ${documents}">
+        <td th:text="${doc.id}"></td>
+        <td th:text="${doc.title}"></td>
+        <td th:text="${doc.documentGroup}"></td>
+        <td th:text="${doc.downloads}"></td>
+
+        <td th:text="${doc.downloadsDelta == null ? '' :
+                             (doc.downloadsDelta > 0 ? '+' : '') + ${#numbers.formatDecimal(doc.downloadsDelta, 1, 1)} + '%'}"
+            th:classappend="${doc.downloadsDelta != null and doc.downloadsDelta > 0} ? 'positive' :
+                                    (doc.downloadsDelta != null and doc.downloadsDelta < 0) ? 'negative' : ''">
+        </td>
+
+        <td th:text="${doc.views}"></td>
+
+        <td th:text="${doc.viewsDelta == null ? '' :
+                             (doc.viewsDelta > 0 ? '+' : '') + ${#numbers.formatDecimal(doc.viewsDelta, 1, 1)} + '%'}"
+            th:classappend="${doc.viewsDelta != null and doc.viewsDelta > 0} ? 'positive' :
+                                    (doc.viewsDelta != null and doc.viewsDelta < 0) ? 'negative' : ''">
+        </td>
+
+        <td th:text="${doc.addedBy}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -13,4 +13,8 @@ public interface DocumentService {
     Document saveDocument(Long groupId, MultipartFile file, String mame);
 
     void deleteAll(List<Document> documents);
+
+    Document getById(Long id);
+
+    Document getByName(String name);
 }
