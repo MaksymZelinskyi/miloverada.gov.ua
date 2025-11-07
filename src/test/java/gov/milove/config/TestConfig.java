@@ -2,6 +2,7 @@ package gov.milove.config;
 
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.log4j.Log4j2;
+import net.bytebuddy.utility.dispatcher.JavaDispatcher;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -11,7 +12,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+
+import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 
 @TestConfiguration
 @EnableAutoConfiguration
@@ -35,6 +41,17 @@ public class TestConfig {
     log.info("PostgreSQL container started on port: {}",
         container.getMappedPort(PostgreSQLContainer.POSTGRESQL_PORT));
     return container;
+  }
+
+
+  @Container
+  static MongoDBContainer mongo = new MongoDBContainer("mongo:7.0.5");
+
+  @DynamicPropertySource
+  static void overrideProps(DynamicPropertyRegistry registry) {
+    registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
+    registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+    registry.add("spring.jpa.properties.hibernate.jdbc.time_zone", () -> "UTC");
   }
 
   @Bean
