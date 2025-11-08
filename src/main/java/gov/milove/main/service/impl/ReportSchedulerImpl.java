@@ -46,7 +46,8 @@ public class ReportSchedulerImpl implements ReportScheduler {
      * Logs and handles exceptions
      */
     @Override
-    @Scheduled(cron = "0 0 8 1 * *")
+    @Scheduled(fixedDelay = 60_000)
+    // @Scheduled(cron = "0 0 8 1 * *")
     public void sendMonthlyReport() {
         try {
             LocalDateTime now = LocalDateTime.now();

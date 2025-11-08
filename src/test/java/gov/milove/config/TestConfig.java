@@ -43,17 +43,6 @@ public class TestConfig {
     return container;
   }
 
-
-  @Container
-  static MongoDBContainer mongo = new MongoDBContainer("mongo:7.0.5");
-
-  @DynamicPropertySource
-  static void overrideProps(DynamicPropertyRegistry registry) {
-    registry.add("spring.data.mongodb.uri", mongo::getReplicaSetUrl);
-    registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-    registry.add("spring.jpa.properties.hibernate.jdbc.time_zone", () -> "UTC");
-  }
-
   @Bean
   public JwtDecoder jwtDecoder() {
     String secretKey = "Q29uZ3JhdHVsYXRpb25zISBZb3UndmUgZ2VuZXJhdGVkIGEgc2VjdXJlIGtleSE=";
