@@ -4,6 +4,7 @@ import gov.milove.main.domain.AppUser;
 import gov.milove.main.domain.Document;
 import gov.milove.main.domain.DocumentGroup;
 import gov.milove.main.domain.MongoDocument;
+import gov.milove.main.exception.AppUserNotFoundException;
 import gov.milove.main.exception.DocumentNotFoundException;
 import gov.milove.main.exception.ServiceException;
 import gov.milove.main.exception.ValidationException;
@@ -124,8 +125,12 @@ public class DocumentServiceImpl implements DocumentService {
             MongoDocument mongoDocument = new MongoDocument(file.getOriginalFilename(), new Binary(bytes), file.getContentType());
             MongoDocument savedMongo = mongoDocumentRepo.save(mongoDocument);
             log.info("document saved to mongo = {}", savedMongo);
-
-            AppUser user = appUserService.getCurrentUser();
+            AppUser user = null;
+            try {
+                user = appUserService.getCurrentUser();
+            } catch (AppUserNotFoundException e) {
+                log.error("Current user not found");
+            }
             Document document = Document.builder()
                     .mongoId(savedMongo.getId())
                     .documentGroup(groupRepository.getReferenceById(groupId))
