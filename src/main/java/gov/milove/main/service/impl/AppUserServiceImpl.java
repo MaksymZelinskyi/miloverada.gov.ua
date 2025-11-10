@@ -16,14 +16,16 @@ public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository repository;
 
+    @Override
     public AppUser getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
         if (auth instanceof JwtAuthenticationToken) {
-            String email = ((JwtAuthenticationToken) auth).getToken().getClaim("email");
+            var token = ((JwtAuthenticationToken) auth).getToken();
+            if (token == null) throw new AppUserNotFoundException("No token");
+            String email = token.getClaim("email");
             return repository.findByEmail(email).orElseThrow(() -> new AppUserNotFoundException("Current user not found"));
         }
-        return repository.findByEmail(auth.getName()).orElseThrow(() -> new AppUserNotFoundException("Current user not found"));
+        return repository.findById(auth.getName()).orElseThrow(() -> new AppUserNotFoundException("Current user not found"));
     }
 
 }
