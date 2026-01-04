@@ -20,6 +20,7 @@ public class AbstractDocumentStatsIntegrationTest extends AuthenticatedIntegrati
     protected final String TEST_FILENAME = "test filename";
     protected final String TEST_DATA = "test data";
     protected Long testDocumentId;
+    protected Document testDoc;
     @Autowired
     protected DocumentStatisticsRepository documentStatisticsRepository;
     @MockBean
@@ -32,12 +33,12 @@ public class AbstractDocumentStatsIntegrationTest extends AuthenticatedIntegrati
     @BeforeEach
     public void setUp() {
 
-        Document document = new Document();
-        document.setName(TEST_FILENAME);
-        document.setTitle(TEST_FILENAME);
-        document.setHashCode(3);
-        document.setAddedBy(user);
-        testDocumentId = documentRepository.save(document).getId();
+        testDoc = new Document();
+        testDoc.setName(TEST_FILENAME);
+        testDoc.setTitle(TEST_FILENAME);
+        testDoc.setHashCode(3);
+        testDoc.setAddedBy(user);
+        testDocumentId = documentRepository.save(testDoc).getId();
         MongoDocument mongoDocument = new MongoDocument(TEST_FILENAME, new Binary(TEST_DATA.getBytes()), "UTF-8");
         mongoDocumentRepo.save(mongoDocument);
         when(mongoDocumentRepo.findByFilename(TEST_FILENAME)).thenReturn(List.of(mongoDocument));
