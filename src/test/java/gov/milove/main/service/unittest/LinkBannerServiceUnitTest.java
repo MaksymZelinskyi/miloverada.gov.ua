@@ -2,6 +2,7 @@ package gov.milove.main.service.unittest;
 
 import gov.milove.main.domain.LinkBanner;
 import gov.milove.main.dto.LinkBannerDto;
+import gov.milove.main.dto.request.LinkBannerCreateRequest;
 import gov.milove.main.dto.request.LinkBannerUpdateRequest;
 import gov.milove.main.exception.LinkBannerNotFoundException;
 import gov.milove.main.repository.jpa.LinkBannerRepository;
@@ -56,9 +57,10 @@ class LinkBannerServiceUnitTest {
   @DisplayName("Should save link banner when valid banner provided")
   void shouldSaveLinkBanner() {
     LinkBanner linkBanner = new LinkBanner();
+    LinkBannerCreateRequest dto = new LinkBannerCreateRequest("", "", "", null);
     when(linkBannerRepository.save(any(LinkBanner.class))).thenReturn(linkBanner);
 
-    LinkBanner savedBanner = underTest.save(linkBanner);
+    LinkBannerDto savedBanner = underTest.save(dto, null);
 
     assertNotNull(savedBanner);
     verify(linkBannerRepository).save(linkBanner);
@@ -78,7 +80,7 @@ class LinkBannerServiceUnitTest {
       when(linkBannerRepository.findById(request.id())).thenReturn(Optional.of(linkBanner));
       when(linkBannerRepository.save(any(LinkBanner.class))).thenReturn(linkBanner);
 
-      LinkBanner updatedBanner = underTest.update(request);
+      LinkBannerDto updatedBanner = underTest.update(request);
 
       assertNotNull(updatedBanner);
       verify(linkBannerMapper).updateLinkBannerFromDto(request, linkBanner);
