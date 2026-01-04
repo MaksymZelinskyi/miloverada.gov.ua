@@ -9,8 +9,11 @@ import gov.milove.main.dto.DocumentReportItemDto;
 import gov.milove.main.repository.jpa.AppUserRepository;
 import gov.milove.main.repository.jpa.DocumentRepository;
 import gov.milove.main.repository.jpa.DocumentStatisticsRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +24,8 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DataJpaTest
-@Transactional
-public class DocumentReportDBIntegrationTest extends IntegrationTest {
+@Slf4j
+public class DocumentReportDBIntegrationTest extends AbstractDocumentStatsIntegrationTest {
 
     private final int DOWNLOADS_COUNT = 5, VIEWS_COUNT = 10;
 
@@ -31,37 +33,32 @@ public class DocumentReportDBIntegrationTest extends IntegrationTest {
     private DocumentRepository documentRepository;
     @Autowired
     private DocumentStatisticsRepository documentStatisticsRepository;
-    @Autowired
-    private AppUserRepository appUserRepository;
 
-    private AppUser user;
-    private Document document;
+    private LocalDateTime beforeSave;
+    private LocalDateTime afterSave;
 
     @BeforeEach
     public void saveAndFetchDocument() {
-        user = new AppUser();
-        user.setEmail("email");
-        user = appUserRepository.save(user);
-
-        document = new Document();
-        document.setTitle("Document1");
-        document.setName("Document1");
-        document.setAddedBy(user);
-        document = documentRepository.save(document);
+        this.beforeSave = LocalDateTime.now().minusMinutes(5);
 
         for (int i = 0; i < DOWNLOADS_COUNT; i++) {
-            documentStatisticsRepository.save(new DocumentRetrieval(document, Action.DOWNLOAD));
+            DocumentRetrieval dr = documentStatisticsRepository.save(new DocumentRetrieval(testDoc, Action.DOWNLOAD));
+            log.info("Recorded document retrieval: {}", dr);
         }
         for (int i = 0; i < VIEWS_COUNT; i++) {
-            documentStatisticsRepository.save(new DocumentRetrieval(document, Action.VIEW));
+            DocumentRetrieval dr = documentStatisticsRepository.save(new DocumentRetrieval(testDoc, Action.VIEW));
+            log.info("Recorded document retrieval: {}", dr);
         }
+        this.afterSave = LocalDateTime.now().plusMinutes(1);
     }
 
     @Test
     public void testDocumentRetrievalsRecorded() {
         List<DocumentReportItemDto> list = documentStatisticsRepository.
-                findDocumentStatisticsByCreatedOnBetween(LocalDateTime.now().minusDays(1), LocalDateTime.now());
-        DocumentReportItemDto dto = list.stream().filter(x -> Objects.equals(x.getId(), document.getId())).findFirst().orElseThrow();
+                findDocumentStatisticsByCreatedOnBetween(beforeSave, afterSave);
+        DocumentReportItemDto dto = list.stream()
+                .filter(x -> Objects.equals(x.getId(), testDocumentId))
+                .findFirst().orElseThrow();
 
         assertEquals(DOWNLOADS_COUNT, dto.getDownloads());
         assertEquals(VIEWS_COUNT, dto.getViews());
