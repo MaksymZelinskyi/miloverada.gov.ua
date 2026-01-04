@@ -51,19 +51,24 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Document saveDocument(Long groupId, MultipartFile file, String title) {
-        validateDocumentFile(file);
-        Optional<Document> documentOpt = documentRepository.findByHashCode(file.hashCode());
-        log.info("save or get document with filename - {}", file.getOriginalFilename());
-        if (documentOpt.isPresent()) {
-            log.info("document already exists");
-            Document document = documentOpt.get();
-            document.setTitle(title);
-            document.setName(file.getOriginalFilename());
-            addToGroupAndReturn(documentOpt.get(), groupId);
-            return document;
-        }
+        try {
+            validateDocumentFile(file);
+            Optional<Document> documentOpt = documentRepository.findByHashCode(Arrays.hashCode(file.getBytes()));
+            log.info("save or get document with filename - {}", file.getOriginalFilename());
+            if (documentOpt.isPresent()) {
+                log.info("document already exists");
+                Document document = documentOpt.get();
+                document.setTitle(title);
+                document.setName(file.getOriginalFilename());
+                addToGroupAndReturn(documentOpt.get(), groupId);
+                return document;
+            }
 
-        return save(groupId, file, title);
+            return save(groupId, file, title);
+        } catch (IOException e) {
+            log.info("Document save error: {}", e.getMessage());
+            throw new ServiceException("Document save error", e);
+        }
     }
 
     private void validateDocumentFile(MultipartFile file) {
