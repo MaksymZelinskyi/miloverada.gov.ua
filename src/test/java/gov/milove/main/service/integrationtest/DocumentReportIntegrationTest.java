@@ -14,14 +14,15 @@ import gov.milove.main.service.impl.DocumentStatsService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.Binary;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,10 +30,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Slf4j
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest {
+
     private final int DOWNLOADS_COUNT = 5, VIEWS_COUNT = 10;
     private final String TEST_FILENAME = "test filename";
     private final String TEST_DATA = "test data";
+
     @MockBean
     protected MongoDocumentRepo mongoDocumentRepo;
     @Autowired
@@ -45,6 +49,7 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
     private UploadImpl upload;
     @Autowired
     private DocumentStatsService documentStatsService;
+
     private Long testDocumentId;
     private Document testDoc;
     private LocalDateTime beforeSave;
@@ -52,8 +57,11 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
 
     @BeforeEach
     public void setUp() {
-
         testDoc = new Document();
+        Optional<Document> found = documentRepository.findByName(TEST_FILENAME);
+        if (found.isPresent())
+            testDoc = found.get();
+
         testDoc.setName(TEST_FILENAME);
         testDoc.setTitle(TEST_FILENAME);
         testDoc.setHashCode(3);
@@ -81,6 +89,7 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
     }
 
     @Test
+    @Order(1)
     public void testDocumentRetrievalsRecorded() {
         List<DocumentReportItemDto> list = documentStatisticsRepository.findDocumentStatisticsByCreatedOnBetween(beforeSave, afterSave);
         DocumentReportItemDto dto = list.stream().filter(x -> Objects.equals(x.getId(), testDocumentId)).findFirst().orElseThrow();
@@ -90,7 +99,8 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
     }
 
     @Test
-    void documentAddedToStatistics() {
+    @Order(2)
+    public void documentAddedToStatistics() {
         List<DocumentReportItemDto> stats = documentStatisticsRepository.findDocumentStatisticsByCreatedOnBetween(LocalDateTime.now().minusMonths(1), LocalDateTime.now());
 
         assertThat(stats).isNotNull().isNotEmpty();
@@ -99,6 +109,7 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
     }
 
     @Test
+    @Order(3)
     public void deltasWrittenProperly() {
         List<DocumentReportItemDto> stats = documentStatsService.getReportData(LocalDateTime.now().minusMonths(1), LocalDateTime.now());
 
@@ -107,7 +118,8 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
     }
 
     @Test
-    void viewsAndDownloadsAreCounted() throws Exception {
+    @Order(4)
+    public void viewsAndDownloadsAreCounted() throws Exception {
         documentController.markAsViewed(testDocumentId);
         upload.findDocumentByFilename(TEST_FILENAME, mock(HttpServletResponse.class));
 
