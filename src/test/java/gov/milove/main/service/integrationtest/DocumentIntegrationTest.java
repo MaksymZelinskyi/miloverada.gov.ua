@@ -1,4 +1,4 @@
-package gov.milove.main.controller.integrationtest;
+package gov.milove.main.service.integrationtest;
 
 import gov.milove.main.domain.Document;
 import gov.milove.main.domain.DocumentGroup;
@@ -11,13 +11,11 @@ import gov.milove.main.service.impl.DocumentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,9 +50,7 @@ class DocumentIntegrationTest extends AuthenticatedIntegrationTest {
     @Test
     void savesDocument() throws Exception {
 
-        MockMultipartFile file = new MockMultipartFile(
-                "file", "report.txt", "text/plain", "Integration Test Data".getBytes()
-        );
+        MockMultipartFile file = new MockMultipartFile("file", "report.txt", "text/plain", "Integration Test Data".getBytes());
 
 
         Document saved = documentService.saveDocument(group.getId(), file, "Monthly Report");
