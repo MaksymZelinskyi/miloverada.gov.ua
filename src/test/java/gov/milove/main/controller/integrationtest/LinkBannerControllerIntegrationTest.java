@@ -74,7 +74,7 @@ class LinkBannerControllerIntegrationTest extends IntegrationTest {
     void addBanner_shouldSave_whenValidParams() throws Exception {
 
 
-      var request = new LinkBannerCreateRequest("https://www.linkedin.com", "Some text");
+      var request = new LinkBannerCreateRequest("https://www.linkedin.com", "Some text", "", null);
       String content = objectMapper.writeValueAsString(request);
 
       MvcResult result = mockMvc.perform(post(PROTECTED_API + "/link-banners")
@@ -98,7 +98,7 @@ class LinkBannerControllerIntegrationTest extends IntegrationTest {
     @MethodSource("invalidParams")
     @DisplayName("Should return 400 when invalid input")
     void addBanner_shouldReturn400_whenInvalidInput(String url, String text) throws Exception {
-      var request = new LinkBannerCreateRequest(url, text);
+      var request = new LinkBannerCreateRequest(url, text, "", null);
       String content = objectMapper.writeValueAsString(request);
 
       mockMvc.perform(post(PROTECTED_API + "/link-banners")
