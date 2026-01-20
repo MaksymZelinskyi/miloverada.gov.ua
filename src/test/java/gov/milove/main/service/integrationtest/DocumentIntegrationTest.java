@@ -53,7 +53,7 @@ class DocumentIntegrationTest extends AuthenticatedIntegrationTest {
         MockMultipartFile file = new MockMultipartFile("file", "report.txt", "text/plain", "Integration Test Data".getBytes());
 
 
-        Document saved = documentService.saveDocument(group.getId(), file, "Monthly Report");
+        Document saved = documentService.saveDocument(group.getId(), file, "Monthly Report", user.getId());
 
         assertThat(saved).isNotNull();
         assertThat(saved.getId()).isNotNull();
@@ -73,8 +73,8 @@ class DocumentIntegrationTest extends AuthenticatedIntegrationTest {
     void savesDocumentAndDetectsDuplicate() throws Exception {
         MultipartFile file = new MockMultipartFile("file", "doc.txt", "text/plain", "hello".getBytes());
 
-        documentService.saveDocument(group.getId(), file, "doc");
-        documentService.saveDocument(group.getId(), file, "doc");
+        documentService.saveDocument(group.getId(), file, "doc", user.getId());
+        documentService.saveDocument(group.getId(), file, "doc", user.getId());
 
         List<Document> docs = documentRepository.findAll();
         assertThat(docs).hasSize(1);

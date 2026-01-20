@@ -10,7 +10,7 @@ public interface DocumentService {
 
     void deleteById(Long id);
 
-    Document saveDocument(Long groupId, MultipartFile file, String mame);
+    Document saveDocument(Long groupId, MultipartFile file, String name, String userId);
 
     void deleteAll(List<Document> documents);
 
