@@ -8,6 +8,7 @@ import gov.milove.main.exception.AppUserNotFoundException;
 import gov.milove.main.exception.DocumentNotFoundException;
 import gov.milove.main.exception.ServiceException;
 import gov.milove.main.exception.ValidationException;
+import gov.milove.main.repository.jpa.AppUserRepository;
 import gov.milove.main.repository.jpa.DocumentGroupRepository;
 import gov.milove.main.repository.jpa.DocumentRepository;
 import gov.milove.main.repository.mongo.MongoDocumentRepo;
@@ -40,6 +41,8 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final AppUserService appUserService;
 
+    private final AppUserRepository appUserRepository;
+
     @Override
     public void deleteById(Long id) {
         log.info("Delete document by id {}", id);
@@ -50,7 +53,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Document saveDocument(Long groupId, MultipartFile file, String title) {
+    public Document saveDocument(Long groupId, MultipartFile file, String title, String userId) {
         try {
             validateDocumentFile(file);
             Optional<Document> documentOpt = documentRepository.findByHashCode(Arrays.hashCode(file.getBytes()));
@@ -64,7 +67,7 @@ public class DocumentServiceImpl implements DocumentService {
                 return document;
             }
 
-            return save(groupId, file, title);
+            return save(groupId, file, title, userId);
         } catch (IOException e) {
             log.info("Document save error: {}", e.getMessage());
             throw new ServiceException("Document save error", e);
@@ -123,7 +126,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
 
-    private Document save(Long groupId, MultipartFile file, String title) {
+    private Document save(Long groupId, MultipartFile file, String title, String userId) {
         try {
             byte[] bytes = file.getBytes();
 
@@ -131,11 +134,13 @@ public class DocumentServiceImpl implements DocumentService {
             MongoDocument savedMongo = mongoDocumentRepo.save(mongoDocument);
             log.info("document saved to mongo = {}", savedMongo);
             AppUser user = null;
-            try {
-                user = appUserService.getCurrentUser();
-            } catch (AppUserNotFoundException e) {
+            Optional<AppUser> userOptional = appUserRepository.findById(userId);
+            if (userOptional.isPresent()) {
+                user = userOptional.get();
+            } else {
                 log.error("Current user not found");
             }
+
             Document document = Document.builder()
                     .mongoId(savedMongo.getId())
                     .documentGroup(groupRepository.getReferenceById(groupId))
