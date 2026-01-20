@@ -72,7 +72,6 @@ class LinkBannerControllerIntegrationTest extends IntegrationTest {
 
   @Nested
   @DisplayName("Add link banner")
-  @WithMockUser(roles = ADMIN_ROLE, username = "user123")
   class AddLinkBanner {
 
     @Test
@@ -151,7 +150,6 @@ class LinkBannerControllerIntegrationTest extends IntegrationTest {
 
   @Nested
   @DisplayName("Fully update link banner")
-  @WithMockUser(roles = ADMIN_ROLE, username = "user123")
   class UpdateLinkBanner {
 
     @Test
@@ -206,7 +204,6 @@ class LinkBannerControllerIntegrationTest extends IntegrationTest {
 
   @Nested
   @DisplayName("Delete link banner")
-  @WithMockUser(roles = ADMIN_ROLE, username = "user123")
   class DeleteLinkBanner {
 
     @Test
