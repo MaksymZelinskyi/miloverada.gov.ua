@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 
 @Tag(name = "Document group controller")
@@ -53,9 +54,9 @@ public interface DocumentGroupController {
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
                             schema = @Schema(type = "string", format = "binary"))),
             @Parameter(name = "title", description = "Title of the document", required = true,
-                    schema = @Schema(type = "string", example = "My Contract"))
+                    schema = @Schema(type = "string", example = "My Contract")),
     })
-    Document newDoc(Long id, MultipartFile file, String title);
+    Document newDoc(Long id, MultipartFile file, String title, Principal principal);
 
     @Operation(summary = "Find document group by id")
     DocumentGroupWithGroupsDtoAndDocumentsDto findById(Long id);

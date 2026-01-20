@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -69,10 +70,11 @@ public class DocumentGroupControllerImpl implements DocumentGroupController {
     @PostMapping("/protected/documentGroup/{id}/document/new")
     public Document newDoc(@PathVariable Long id,
                            @RequestParam MultipartFile file,
-                           @RequestParam String title) {
+                           @RequestParam String title,
+                           Principal principal) {
         log.info("Add new document, filename: {}, size: {}, title: {}", file.getOriginalFilename(),
                 file.getSize(), title);
-        return documentService.saveDocument(id, file, title);
+        return documentService.saveDocument(id, file, title, principal.getName());
     }
 
     @Override

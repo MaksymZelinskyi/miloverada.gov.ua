@@ -45,7 +45,7 @@ public class Document {
     private DocumentGroup documentGroup;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User addedBy;
+    private AppUser addedBy;
 
     public Document(Long id, String title, String name) {
         this.id = id;
