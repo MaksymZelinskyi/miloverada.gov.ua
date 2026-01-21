@@ -1,7 +1,6 @@
 package gov.milove.main.controller.integrationtest;
 
-import static gov.milove.main.constants.Constants.ADMIN_ROLE;
-import static gov.milove.testdata.AuhenticationTestData.PROTECTED_API;
+import static gov.milove.testdata.AuhenticationTestData.*;
 import static gov.milove.testdata.LinkBannerTestData.LINK_BANNER_FOR_DELETION_ID;
 import static gov.milove.testdata.LinkBannerTestData.LINK_BANNER_ID;
 import static org.hamcrest.Matchers.hasSize;
@@ -89,7 +88,7 @@ class LinkBannerControllerIntegrationTest extends IntegrationTest {
                       .param("url", EXAMPLE_URL)
                       .param("text", "Some text")
                       .param("imageUrl", EXAMPLE_URL)
-                      .with(jwt().authorities(new SimpleGrantedAuthority("admin")))
+                      .with(jwt().jwt(jwt -> jwt.subject(TEST_USER_NAME)).authorities(new SimpleGrantedAuthority(TEST_USER_ROLE)))
                       .with(csrf()))
               .andDo(print())  // Print request/response for debugging
               .andExpectAll(
