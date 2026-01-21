@@ -46,7 +46,7 @@ public class LinkBannerControllerImpl implements LinkBannerController {
       @ModelAttribute LinkBannerCreateRequest request, Principal user) {
     LinkBannerDto saved = linkBannerService.save(request, user.getName());
 
-    return new ResponseEntity<>(saved, CREATED);
+     return new ResponseEntity<>(saved, CREATED);
   }
 
   @Override
