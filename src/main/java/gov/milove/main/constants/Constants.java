@@ -10,8 +10,6 @@ public class Constants {
 
   public static final String CONTENT_MANAGER_ROLE = "content_manager";
 
-  public static final String ADMIN_ROLE = "admin";
-
   public static final String TRACE_ID_KEY = "traceId";
 
   public static final String TRACE_ID_HEADER_NAME = "X-Trace-Id";

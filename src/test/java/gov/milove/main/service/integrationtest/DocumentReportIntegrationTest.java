@@ -1,12 +1,11 @@
 package gov.milove.main.service.integrationtest;
 
+import gov.milove.config.IntegrationTest;
 import gov.milove.main.controller.impl.DocumentControllerImpl;
 import gov.milove.main.controller.impl.UploadImpl;
-import gov.milove.main.domain.Action;
-import gov.milove.main.domain.Document;
-import gov.milove.main.domain.DocumentRetrieval;
-import gov.milove.main.domain.MongoDocument;
+import gov.milove.main.domain.*;
 import gov.milove.main.dto.DocumentReportItemDto;
+import gov.milove.main.repository.jpa.AppUserRepository;
 import gov.milove.main.repository.jpa.DocumentRepository;
 import gov.milove.main.repository.jpa.DocumentStatisticsRepository;
 import gov.milove.main.repository.mongo.MongoDocumentRepo;
@@ -14,16 +13,18 @@ import gov.milove.main.service.impl.DocumentStatsService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.Binary;
-import org.junit.Before;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static gov.milove.testdata.AuhenticationTestData.TEST_USER_NAME;
+import static gov.milove.testdata.DocumentTestData.TEST_DATA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -31,13 +32,14 @@ import static org.mockito.Mockito.when;
 
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest {
+@Sql({"classpath:/testdata/appuser-test-data.sql"})
+public class DocumentReportIntegrationTest extends IntegrationTest {
 
-    private final int DOWNLOADS_COUNT = 5, VIEWS_COUNT = 10;
-    private final String TEST_FILENAME = "test filename";
-    private final String TEST_DATA = "test data";
+    private static final int DOWNLOADS_COUNT = 5, VIEWS_COUNT = 10;
+    private static final String TEST_FILENAME = "test filename";
+    private static final String TEST_EMAIL = "user@email.com";
 
-    @MockBean
+    @Autowired
     protected MongoDocumentRepo mongoDocumentRepo;
     @Autowired
     private DocumentRepository documentRepository;
@@ -49,6 +51,8 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
     private UploadImpl upload;
     @Autowired
     private DocumentStatsService documentStatsService;
+    @Autowired
+    private AppUserRepository appUserRepository;
 
     private Long testDocumentId;
     private Document testDoc;
@@ -57,6 +61,7 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
 
     @BeforeEach
     public void setUp() {
+        AppUser user = appUserRepository.findById(TEST_USER_NAME).orElseThrow();
         testDoc = new Document();
         Optional<Document> found = documentRepository.findByName(TEST_FILENAME);
         if (found.isPresent())
@@ -67,10 +72,8 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
         testDoc.setHashCode(3);
         testDoc.setAddedBy(user);
         testDocumentId = documentRepository.save(testDoc).getId();
-        MongoDocument mongoDocument = new MongoDocument(TEST_FILENAME, new Binary(TEST_DATA.getBytes()), "UTF-8");
+        MongoDocument mongoDocument = new MongoDocument(TEST_FILENAME, new Binary(TEST_DATA), "UTF-8");
         mongoDocumentRepo.save(mongoDocument);
-        when(mongoDocumentRepo.findByFilename(TEST_FILENAME)).thenReturn(List.of(mongoDocument));
-        documentRepository.flush();
     }
 
     @BeforeEach
@@ -119,7 +122,7 @@ public class DocumentReportIntegrationTest extends AuthenticatedIntegrationTest 
 
     @Test
     @Order(4)
-    public void viewsAndDownloadsAreCounted() throws Exception {
+    public void viewsAndDownloadsAreCounted() {
         documentController.markAsViewed(testDocumentId);
         upload.findDocumentByFilename(TEST_FILENAME, mock(HttpServletResponse.class));
 

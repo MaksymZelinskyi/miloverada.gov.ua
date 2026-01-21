@@ -14,7 +14,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static gov.milove.testdata.AuhenticationTestData.PROTECTED_API;
+import static gov.milove.testdata.AuhenticationTestData.*;
+import static gov.milove.testdata.DocumentTestData.DOCUMENT_TITLE;
+import static gov.milove.testdata.DocumentTestData.GROUP_ID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -28,9 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Document group controller integration test")
 public class DocumentControllerIntegrationTest extends IntegrationTest {
 
-    private static final int DOCUMENT_GROUP_ID = 1;
-    private static final String DOCUMENT_TITLE = "Document Title";
-
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -38,7 +37,7 @@ public class DocumentControllerIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("Should save document")
-    void save_Doc_shouldSave_whenValidParams() throws Exception {
+    void savesDocumentSuccessfully() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile(
                 "file",
                 "text.txt",
@@ -46,17 +45,17 @@ public class DocumentControllerIntegrationTest extends IntegrationTest {
                 "Mock image content".getBytes()
         );
 
-        MvcResult result = mockMvc.perform(multipart(String.format(PROTECTED_API + "/documentGroup/%d/document/new", DOCUMENT_GROUP_ID))
+        MvcResult result = mockMvc.perform(multipart(String.format(PROTECTED_API + "/documentGroup/%d/document/new", GROUP_ID))
                         .file(imageFile)
                         .param("title", DOCUMENT_TITLE)
-                        .with(jwt().jwt(jwt -> jwt.subject("user")).authorities(new SimpleGrantedAuthority("admin")))
+                        .with(jwt().jwt(jwt -> jwt.subject(TEST_USER_NAME)).authorities(new SimpleGrantedAuthority(TEST_USER_ROLE)))
                         .with(csrf()))
                 .andDo(print())  // Print request/response for debugging
                 .andExpectAll(
                         status().is2xxSuccessful(),
                         jsonPath("$.id").isNumber(),
                         jsonPath("$.createdOn").isNotEmpty(),
-                        jsonPath("$.addedBy.id").value("user"),
+                        jsonPath("$.addedBy.id").value(TEST_USER_NAME),
                         jsonPath("$.title").value(DOCUMENT_TITLE)
                 )
                 .andReturn();
