@@ -1,3 +1,7 @@
+app:
+  image:
+    base-url: http://localhost:6060/api/images/
+
 spring:
   config:
     import: "optional:application-dev-environment.properties"
@@ -18,15 +22,6 @@ spring:
 
       repositories:
         enabled: true
-  jpa:
-    properties:
-      hibernate:
-
-    show-sql: true
-#    open-in-view: false
-
-  mvc:
-    throw-exception-if-no-handler-found: true
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -48,6 +43,7 @@ spring:
     restart:
       enabled: false
 
+
 okta:
   oauth2:
     issuer: https://dev-i1ehhh4j3rf2tyqz.us.auth0.com/
@@ -57,6 +53,11 @@ server:
   port: 6060
   tomcat:
     max-http-form-post-size: 50000000
-logging:
-  file:
-    path: logs
+
+#logging:
+#  level:
+#    root: INFO
+#    gov.milove: INFO
+#  pattern:
+#    console: "%d{yyyy-MM-dd HH:mm} [%X{traceId}] %-5level %logger{36} - %msg%n"
+

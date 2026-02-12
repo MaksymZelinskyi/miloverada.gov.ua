@@ -1,0 +1,39 @@
+POSTGRES_CONTAINER_VERSION: postgres:15.8-alpine
+POSTGRES_CONTAINER_USERNAME: postgres
+POSTGRES_CONTAINER_PASSWORD: postgres
+
+logging:
+  level:
+    root: INFO # Set the root logging level to INFO
+    gov.milove: INFO # Set a specific package to DEBUG level (optional)
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm} [%X{traceId}] %-5level %logger{36} - %msg%n"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health"
+
+spring:
+  config:
+    import: "optional:application-test-environment.properties"
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_SENDER}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+application:
+  email:
+    receiver: ${MAIL_RECEIVER}
+    sender: ${MAIL_SENDER}
+
+app:
+  image:
+    base-url: http://localhost:6060/api/images/

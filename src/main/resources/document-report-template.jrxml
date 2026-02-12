@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN"
+        "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="report6" pageWidth="640" pageHeight="842" whenNoDataType="AllSectionsNoDetail"
+              columnWidth="600" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <!-- Styles -->
+    <style name="BorderedCell" hAlign="Center" vAlign="Middle">
+        <box>
+            <pen lineWidth="0.5" lineColor="#000000"/>
+        </box>
+    </style>
+    <style name="TableHeader" style="BorderedCell" vAlign="Middle" hAlign="Center" isBold="true"/>
+    <style name="TableCell" style="BorderedCell" hAlign="Center" vAlign="Middle"/>
+    <style name="TableFooter" hAlign="Right" vAlign="Middle"/>
+    <style name="Table">
+        <box>
+            <pen lineWidth="0.5"/>
+        </box>
+    </style>
+
+
+    <!-- Subdataset for table data -->
+    <subDataset name="dataset1">
+        <field name="id" class="java.lang.Long"/>
+        <field name="title"/>
+        <field name="documentGroup"/>
+        <field name="downloads" class="java.lang.Long"/>
+        <field name="downloadsDelta" class="java.lang.Double"/>
+        <field name="views" class="java.lang.Long"/>
+        <field name="viewsDelta" class="java.lang.Double"/>
+        <field name="addedBy"/>
+    </subDataset>
+
+    <!-- Parameter for subdataset datasource -->
+    <parameter name="datasource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+    <parameter name="start" class="java.lang.String"/>
+    <parameter name="end" class="java.lang.String"/>
+
+    <!-- Background -->
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+
+    <title>
+        <band height="40" splitType="Stretch">
+            <textField>
+                <reportElement x="0" y="0" width="640" height="30"/>
+                <textElement textAlignment="Center">
+                    <font fontName="Arial" size="18" isBold="true"/>
+                </textElement>
+                <textFieldExpression>
+                    <![CDATA["Document report for the period: " + $P{start} + " - " + $P{end}]]>
+                </textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- Report Content -->
+    <detail>
+        <band height="250" splitType="Stretch">
+            <componentElement>
+                <reportElement style="Table" x="0" y="10" width="555" height="150"/>
+                <c:table xmlns:c="http://jasperreports.sourceforge.net/jasperreports/components"
+                         xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components
+                         http://jasperreports.sourceforge.net/xsd/components.xsd">
+
+                    <datasetRun subDataset="dataset1">
+                        <dataSourceExpression><![CDATA[$P{datasource}]]></dataSourceExpression>
+                    </datasetRun>
+
+                    <!-- Document id Column -->
+                    <c:column width="100">
+                        <c:columnHeader height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" style="TableHeader"/>
+
+                                <text><![CDATA[Document id]]></text>
+                            </staticText>
+                        </c:columnHeader>
+                        <c:detailCell height="15">
+                            <textField textAdjust="StretchHeight">
+                                <reportElement x="0" y="0" width="100" height="15" style="TableCell"/>
+                                <textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+                            </textField>
+                        </c:detailCell>
+                    </c:column>
+
+                    <!-- Document title Column -->
+                    <c:column width="100">
+                        <c:columnHeader height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" style="TableHeader"/>
+                                <text><![CDATA[Document title]]></text>
+                            </staticText>
+                        </c:columnHeader>
+                        <c:detailCell height="15">
+                            <textField textAdjust="StretchHeight">
+                                <reportElement x="0" y="0" width="100" height="15" style="TableCell"/>
+                                <textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+                            </textField>
+                        </c:detailCell>
+                    </c:column>
+
+                    <!-- Document group Column -->
+                    <c:column width="100">
+                        <c:columnHeader height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" style="TableHeader"/>
+                                <text><![CDATA[Document group]]></text>
+                            </staticText>
+                        </c:columnHeader>
+                        <c:detailCell height="15">
+                            <textField textAdjust="StretchHeight">
+                                <reportElement x="0" y="0" width="100" height="15" style="TableCell"/>
+                                <textFieldExpression><![CDATA[$F{documentGroup}]]></textFieldExpression>
+                            </textField>
+                        </c:detailCell>
+                    </c:column>
+
+                    <!-- Downloads Column -->
+                    <c:column width="100">
+                        <c:columnHeader height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" style="TableHeader"/>
+                                <text><![CDATA[Downloads]]></text>
+                            </staticText>
+                        </c:columnHeader>
+                        <c:detailCell height="15">
+                            <textField textAdjust="StretchHeight">
+                                <reportElement x="0" y="0" width="100" height="15" style="TableCell"/>
+                                <textFieldExpression><![CDATA[$F{downloads}]]></textFieldExpression>
+                            </textField>
+                        </c:detailCell>
+                    </c:column>
+
+                    <!-- Downloads Change Column -->
+                    <c:column width="100">
+                        <c:columnHeader height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" style="TableHeader"/>
+                                <text><![CDATA[Downloads Delta]]></text>
+                            </staticText>
+                        </c:columnHeader>
+                        <c:detailCell height="15">
+                            <textField isBlankWhenNull="true">
+                                <reportElement x="0" y="0" width="100" height="15" style="TableCell"/>
+                                <textFieldExpression>
+                                    <![CDATA[
+                                        $F{downloadsDelta} == null ? "" :
+                                        ($F{downloadsDelta} > 0 ? "+" : "") + new java.text.DecimalFormat("0.0").format($F{downloadsDelta}) + "%"
+                                    ]]>
+                                </textFieldExpression>
+                            </textField>
+                        </c:detailCell>
+                    </c:column>
+
+                    <!-- Views Column -->
+                    <c:column width="100">
+                        <c:columnHeader height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" style="TableHeader"/>
+                                <text><![CDATA[Views]]></text>
+                            </staticText>
+                        </c:columnHeader>
+                        <c:detailCell height="15">
+                            <textField textAdjust="StretchHeight">
+                                <reportElement x="0" y="0" width="100" height="15" style="TableCell"/>
+                                <textFieldExpression><![CDATA[$F{views}]]></textFieldExpression>
+                            </textField>
+                        </c:detailCell>
+                    </c:column>
+
+                    <!-- Views Delta Column -->
+                    <c:column width="100">
+                        <c:columnHeader height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" style="TableHeader"/>
+                                <text><![CDATA[Views Delta]]></text>
+                            </staticText>
+                        </c:columnHeader>
+                        <c:detailCell height="15">
+                            <textField isBlankWhenNull="true">
+                                <reportElement x="0" y="0" width="100" height="15" style="TableCell"/>
+                                <textFieldExpression>
+                                    <![CDATA[
+                                        $F{viewsDelta} == null ? "" :
+                                        ($F{viewsDelta} > 0 ? "+" : "") + new java.text.DecimalFormat("0.0").format($F{viewsDelta}) + "%"
+                                    ]]>
+                                </textFieldExpression>
+                            </textField>
+                        </c:detailCell>
+                    </c:column>
+
+                    <!-- Added by Column -->
+                    <c:column width="100">
+                        <c:columnHeader height="30">
+                            <staticText>
+                                <reportElement x="0" y="0" width="100" height="30" style="TableHeader"/>
+                                <text><![CDATA[Added by]]></text>
+                            </staticText>
+                        </c:columnHeader>
+                        <c:detailCell height="15">
+                            <textField textAdjust="StretchHeight">
+                                <reportElement x="0" y="0" width="100" height="15" style="TableCell"/>
+                                <textFieldExpression><![CDATA[$F{addedBy}]]></textFieldExpression>
+                            </textField>
+                        </c:detailCell>
+                    </c:column>
+
+                </c:table>
+            </componentElement>
+        </band>
+    </detail>
+
+</jasperReport>

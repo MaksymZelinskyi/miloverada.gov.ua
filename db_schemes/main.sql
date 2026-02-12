@@ -10,7 +10,7 @@ create table public.document_group
 );
 
 alter table public.document_group
-    owner to postgres;
+    alter owner to postgres;
 
 create table public.institution
 (
@@ -46,10 +46,24 @@ create table public.document
             references public.document_group,
     hash_code         integer,
     mongo_id          text,
-    created_on        timestamp
+    created_on        timestamp,
+    added_by integer
+        constraint document_author_id_fkey
+            references public.app_users default null
 );
 
 alter table public.document
+    owner to postgres;
+
+create table public.document_retrieval
+(
+    id serial primary key,
+    document_id integer references public.document(id),
+    created_on        timestamp,
+    "action" text
+);
+
+alter table public.document_retrieval
     owner to postgres;
 
 create table public.institution_employee
@@ -252,5 +266,3 @@ create table public.topic_chats
 
 alter table public.topic_chats
     owner to postgres;
-
-

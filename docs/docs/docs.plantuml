@@ -1,0 +1,27 @@
+@startuml
+
+top to bottom direction
+skinparam linetype ortho
+
+together {
+  document  -->  document_group
+  document_group -->  document_group
+}
+
+class document {
+   name: text
+   title: text
+   document_group_id: integer
+   hash_code: integer
+   mongo_id: text
+   created_on: timestamp
+   id: integer
+}
+class document_group {
+   name: text
+   created_on: text
+   document_group_id: integer
+   id: integer
+}
+
+@enduml
