@@ -15,7 +15,7 @@ spring:
 
   data:
     mongodb:
-      database: ${mongo.database}
+      database: ${mongo_database}
       uri: ${mongo_url}
       repositories:
         type: auto
@@ -49,14 +49,14 @@ okta:
     audience: https://miloverada-api
 
 server:
-  port: ${port}
+  port: ${PORT}
 
   tomcat:
     max-http-form-post-size: 50000000
   ssl:
-    enabled: ${ssl.enabled}
-    key-store: ${ssl.key.storage_path}
-    key-store-password: ${ssl.key.password}
+    enabled: ${ssl_enabled}
+    key-store: ${ssl_key_storage_path}
+    key-store-password: ${ssl_key_password}
     key-store-type: PKCS12
     key-alias: tomcat
 
