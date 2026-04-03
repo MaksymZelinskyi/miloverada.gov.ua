@@ -121,7 +121,6 @@ public class DocumentServiceImpl implements DocumentService {
         documents.forEach(this::delete);
     }
 
-
     private Document save(Long groupId, MultipartFile file, String title, String userId) {
         try {
             byte[] bytes = file.getBytes();
@@ -159,6 +158,10 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     public Document getByName(String name) {
+        List<Document> list = documentRepository.findAllByName(name);
+        for (int i = 0; i < list.size()-1; i++) {
+            documentRepository.delete(list.get(i));
+        }
         return documentRepository.findByName(name).orElseThrow(() -> new DocumentNotFoundException("Document with name " + name + "not found"));
     }
 }
