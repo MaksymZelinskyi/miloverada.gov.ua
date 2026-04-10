@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.Binary;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDateTime;
