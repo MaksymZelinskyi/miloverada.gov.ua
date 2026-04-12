@@ -19,4 +19,6 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<DocumentWithGroupDto> searchDistinctByNameContainingIgnoreCaseOrTitleContainingIgnoreCase(String title, String name);
 
     Optional<Document> findByName(String name);
+
+    List<Document> findAllByName(String name);
 }

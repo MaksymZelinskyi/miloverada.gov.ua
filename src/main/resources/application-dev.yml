@@ -54,10 +54,10 @@ server:
   tomcat:
     max-http-form-post-size: 50000000
 
-#logging:
-#  level:
-#    root: INFO
-#    gov.milove: INFO
-#  pattern:
-#    console: "%d{yyyy-MM-dd HH:mm} [%X{traceId}] %-5level %logger{36} - %msg%n"
+logging:
+  level:
+    root: debug
+    gov.milove: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm} [%X{traceId}] %-5level %logger{36} - %msg%n"
 
