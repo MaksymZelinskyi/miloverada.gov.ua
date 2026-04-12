@@ -21,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -63,14 +64,29 @@ class LinkBannerServiceUnitTest {
   @Test
   @DisplayName("Should return all banners sorted by createdOn descending")
   void shouldReturnAllBannersSorted() {
-    List<LinkBanner> expectedBanners = List.of(new LinkBanner(), new LinkBanner());
-    when(linkBannerRepository.findAll(Sort.by("createdOn").descending())).thenReturn(
-            expectedBanners);
+    LinkBanner linkBanner1 = new LinkBanner("id1", "imageUrl1");
+    LinkBanner linkBanner2 = new LinkBanner("id2", "imageUrl2");
+    LinkBannerDto dto1 = new LinkBannerDto(1L, "url", "imageUrl1", "", null, LocalDate.now(), null);
+    LinkBannerDto dto2 = new LinkBannerDto(2L, "url", "imageUrl2", "", null, LocalDate.now(), null);
 
-    Page<LinkBannerDto> actualBanners = underTest.findAllBanners(Pageable.ofSize(10));
+    //must be sorted by createdOn
+    linkBanner1.setCreatedOn(LocalDate.now().minusDays(1));
+    linkBanner2.setCreatedOn(LocalDate.now());
 
-    assertIterableEquals(expectedBanners, actualBanners);
-    verify(linkBannerRepository).findAll(Sort.by("createdOn").descending());
+    List<LinkBanner> expectedBanners = List.of(linkBanner1, linkBanner2);
+    Pageable pageable = Pageable.ofSize(10);
+
+    when(linkBannerMapper.toLinkBannerDto(linkBanner1)).thenReturn(dto1);
+    when(linkBannerMapper.toLinkBannerDto(linkBanner2)).thenReturn(dto2);
+    when(linkBannerRepository.findAll(pageable)).thenReturn(new PageImpl<>(expectedBanners));
+
+    Page<LinkBannerDto> actualBanners = underTest.findAllBanners(pageable);
+    List<LinkBannerDto> actualBannersList = actualBanners.toList();
+
+    assertEquals(dto1, actualBannersList.get(0));
+    assertEquals(dto2, actualBannersList.get(1));
+
+    verify(linkBannerRepository).findAll(pageable);
   }
 
   @Test

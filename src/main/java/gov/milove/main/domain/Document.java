@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NaturalId;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +31,7 @@ public class Document {
     private String title;
 
     @NotNull
+    @NaturalId
     private String name;
 
     @NotNull

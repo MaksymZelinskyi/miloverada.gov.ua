@@ -73,6 +73,7 @@ public class UploadImpl implements Upload {
       }
     MongoDocument mongoDocument = mongoDocuments.get(0);
 
+    log.debug("Fetched {} Mongo documents with name {}", mongoDocuments.size(), fileName);
     if (mongoDocuments.size() > 1) {
       for (MongoDocument document : mongoDocuments.subList(1, mongoDocuments.size())) {
         mongoDocumentRepo.deleteById(document.getId());
